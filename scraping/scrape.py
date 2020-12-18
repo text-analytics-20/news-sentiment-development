@@ -38,7 +38,7 @@ import newspaper
 from tqdm import tqdm
 
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(epilog=__doc__, formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('url', help='Base URL of a news website')
 parser.add_argument(
     '-o',
