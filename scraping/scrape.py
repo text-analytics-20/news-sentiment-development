@@ -3,6 +3,13 @@
 """
 Script for scraping news articles from websites.
 
+
+Example usage for scraping Spiegel Online articles an storing them in the
+file spiegel.json:
+
+    $ python3 scrape.py https://spiegel.de -o spiegel.json
+
+
 Scraped articles are stored in a JSON file with the following structure:
 
 {
@@ -38,7 +45,7 @@ import newspaper
 from tqdm import tqdm
 
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(epilog=__doc__, formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('url', help='Base URL of a news website')
 parser.add_argument(
     '-o',
