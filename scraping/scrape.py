@@ -3,6 +3,13 @@
 """
 Script for scraping news articles from websites.
 
+
+Example usage for scraping Spiegel Online articles an storing them in the
+file spiegel.json:
+
+    $ python3 scrape.py https://spiegel.de -o spiegel.json
+
+
 Scraped articles are stored in a JSON file with the following structure:
 
 {
