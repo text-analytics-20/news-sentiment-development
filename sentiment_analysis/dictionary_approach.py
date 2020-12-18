@@ -45,9 +45,3 @@ class sentimentDictionary():
             dictionary[key]+=value
         else:
             dictionary[key]=value
-
-
-sd=sentimentDictionary()
-sd.predict_sentiment("Die ganze Familie war glücklich und zufrieden. Eines Tages kam ein böser Wolf und tötete alle.", "und", True)
-print(f"Sentiment score is: {sd.sentimentText}")
-print(sd.sentencesWithSentiment)
