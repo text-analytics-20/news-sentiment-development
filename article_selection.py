@@ -45,7 +45,7 @@ def select_articles(articles):
 	
 	
 selected_articles = []
-with open('spiegel.json', 'r') as f:
+with open('test_data/spiegel.json', 'r') as f:
     articles = json.load(f)
     selected_articles = select_articles(articles)
 
