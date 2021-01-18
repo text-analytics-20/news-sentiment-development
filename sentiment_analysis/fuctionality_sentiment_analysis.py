@@ -6,9 +6,9 @@ def analyse_sentiment(text: str, listSearchTerms: list ) -> float:
         return 0.0
     sd = sentimentDictionary()
     sd.predict_sentiment(text, listSearchTerms ,True)
-    #print("Sentences: ", sd.sentencesWithSentiment)
+    #sentences="Sentences: ", sd.sentencesWithSentiment)
     return sd.sentimentText
 
-listSearchTerm=["flüchtling", "geflüchteter", "refugee"]
+listSearchTerm=["flüchtling", "geflüchtete", "refugee"]
 
 

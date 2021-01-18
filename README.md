@@ -73,8 +73,12 @@ At the moment this aproach has the flaw that the direction of sentiment is not c
 In this example the only sentence that is against refugees (Flüchtlinge) is also the only sentence with neutral sentiment. One reason for this is 
 that the verb "wegnehmen" with clear sentiment is split into two words without sentiment.
 A possible solution would be to use part-of-speech tags to e.g. combine split verbs into one. If we find a way to clearly label the object and subject of a sentence it could also be possible to use this for improvements.
-- The SentiWS-Corpus contains only a part of the words carring sentiment. It is by no means complete.
+- The SentiWS-Corpus contains only a part of the words carrying sentiment. It is by no means complete.
 - While inflictions of the words are contained, compound words can not be detected. (e.g. "Flüchtling" has a sentiment weight but "Wirtschaftsflüchtling" does  not). The solution to  this problem lies in additional preprocessing.
+
+An other shortcoming of this approach is the possibility of false sentences. "Searching with the term "flücht" you can e.g. get the following sentence with no connection to refugees and a clear sentiment:   
+- 'Im Prozess um die Terrorserie vom Januar 2015 sind 14 Menschen angeklagt - drei von ihnen sind aber flüchtig.': -0.0048
+
  
 Another possible approach is based on https://huggingface.co/oliverguhr/german-sentiment-bert, a BERT based model for German sentiment analysis.
 The problem is that this model is trained on reviews and tweets for positive and negative data and news articles are used as an example of neutral speech.
