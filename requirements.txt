@@ -1,4 +1,5 @@
 newspaper3k
 tqdm
+spacy-sentiws
 
 
