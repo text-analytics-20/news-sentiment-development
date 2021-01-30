@@ -91,7 +91,15 @@ def load_article(
         np_article.download()
         np_article.parse()
     except newspaper.ArticleException:
-        logger.debug(f'Could not download {np_article.url}')
+        logger.debug(f'Could not find article {np_article.url}')
+        return None
+    except Exception:
+        # download() may also throw other exceptions, such as:
+        # UnicodeDecodeError: 'utf-8' codec can't decode byte X in position Y:
+        # invalid continuation byte
+        # Therefore we also catch unspecified exceptions here in order to not
+        # make the program crash
+        logger.debug(f'Error loading {np_article.url}:', exc_info=True)
         return None
     # Initialize article dict with misc. metadata from newspaper (site-dependent!)
     article = dict(np_article.meta_data)
