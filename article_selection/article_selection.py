@@ -8,16 +8,23 @@ project.
 """
 
 import json
+import os
 
 
 def is_topic_relevant(article):
     """decides whether an article is topic relevant or not"""
-    keywords = ['migra', 'flücht', 'asyl']
+    keywords = ["klima","umwelt"]#['migra', 'flücht', 'asyl']
     try:
         search_corpus = article['news_keywords'].lower() # not every article has the attribute news_keywords
     except KeyError:
         search_corpus = article['title'].lower() + article['text'].lower() # article['description'] could be considered as well if attribute available
-
+    except AttributeError:
+        print(f"ERROR: News Keywords are {article['news_keywords']}")
+        return False
+    try: 
+        article['date']
+    except KeyError:
+        return False
     # returns True if keyword is found and false otherwise
     if any(keyword in search_corpus for keyword in keywords):
         return True 
@@ -43,6 +50,36 @@ def is_topic_relevant(article):
     return listSelectedArticles
 """
 
+def write_relevant_content_to_file(file_list, relevant_articles_file, new=False, output_after=5000):
+    if new:
+        try:
+            os.remove(relevant_articles_file)
+        except FileNotFoundError:
+            print("file does already not exist")
+    # t=time()
+    # print(f"Start selecting files. Number of files: {len(file_list)}")
+    # counter=0
+    new_cont={}
+    for json_file in file_list:
+        # if counter%output_after==0 and counter>0:
+            # print(f"{counter} of the files is read. {round(float(counter)/len(file_list)*100 , 0)}% Time since start: {round((time() - t) / 60, 2)} min")
+            # print(f"Approximate time till end is: {round((len(file_list)/float(counter) * (time() - t)-(time() - t)) / 60 , 2)} min") 
+        # counter+=1
+        with open(json_file ,"r") as jf:
+            content=json.load(jf)
+            if(is_topic_relevant(content)):
+                new_cont[json_file]=content
+    try:    
+        with open(relevant_articles_file ,"r+") as ra:
+            content_ra = json.load(ra)
+            content_ra.update(new_cont)
+            ra.seek(0)
+            json.dump(content_ra,ra)
+    except FileNotFoundError:
+        # happens if new is enabled or function called the first time for a filepath
+        with open(relevant_articles_file ,"w") as raf:
+            json.dump(new_cont,raf)
+    # print(f"All files is read. Time since start: {round((time() - t) / 60, 2)}")
 
 
 def select_articles(articles):
