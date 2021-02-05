@@ -3,3 +3,19 @@ tqdm
 spacy-sentiws
 plotly
 
+configparser
+glob
+sys
+json
+time
+os
+
+pandas
+spacy
+regex 
+gensim
+multiprocessing
+logging
+
+
+
