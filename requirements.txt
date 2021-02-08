@@ -2,6 +2,7 @@ newspaper3k
 tqdm
 spacy-sentiws
 plotly
+pandas
 
 configparser
 glob
@@ -17,5 +18,6 @@ gensim
 multiprocessing
 logging
 
-
-
+# For BERT model
+transformers
+torch
