@@ -1,22 +1,11 @@
 newspaper3k
 tqdm
+spacy
 spacy-sentiws
 plotly
 pandas
-
-configparser
-glob
-sys
-json
-time
-os
-
-pandas
-spacy
-regex 
+regex
 gensim
-multiprocessing
-logging
 
 # For BERT model
 transformers
