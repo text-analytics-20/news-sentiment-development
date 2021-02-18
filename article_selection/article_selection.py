@@ -9,11 +9,12 @@ project.
 
 import json
 import os
+import random
+from tqdm import tqdm
 
 
-def is_topic_relevant(article):
+def is_topic_relevant(article, keywords: list = ['migra', 'flücht', 'asyl']):
     """decides whether an article is topic relevant or not"""
-    keywords = ["klima","umwelt"]#['migra', 'flücht', 'asyl']
     try:
         search_corpus = article['news_keywords'].lower() # not every article has the attribute news_keywords
     except KeyError:
@@ -31,7 +32,7 @@ def is_topic_relevant(article):
     else:
         return False
 
-"""def select_single_article(article,listSelectedArticles):
+""" def select_single_article(article,listSelectedArticles):
     ''' Calls is_topic_relevant() checks if a timestamp is available for
     input article.
     Appends relevant articles to a given list of selected articles
@@ -50,35 +51,52 @@ def is_topic_relevant(article):
     return listSelectedArticles
 """
 
-def write_relevant_content_to_file(file_list, relevant_articles_file, new=False, output_after=5000):
+
+def write_relevant_content_to_file(file_list, relevant_articles_base, search_keywords, 
+                                   new=False, training_size:int=1000, 
+                                   output_after=5000):
     if new:
         try:
-            os.remove(relevant_articles_file)
+            os.remove(relevant_articles_base+"_evaluation.json")
+            os.remove(relevant_articles_base+"_training.json")
         except FileNotFoundError:
             print("file does already not exist")
     # t=time()
     # print(f"Start selecting files. Number of files: {len(file_list)}")
     # counter=0
-    new_cont={}
-    for json_file in file_list:
+    new_cont = {}
+    for json_file in tqdm(file_list):
         # if counter%output_after==0 and counter>0:
             # print(f"{counter} of the files is read. {round(float(counter)/len(file_list)*100 , 0)}% Time since start: {round((time() - t) / 60, 2)} min")
             # print(f"Approximate time till end is: {round((len(file_list)/float(counter) * (time() - t)-(time() - t)) / 60 , 2)} min") 
         # counter+=1
-        with open(json_file ,"r") as jf:
-            content=json.load(jf)
+        with open(json_file, "r") as jf:
+            content = json.load(jf)
             if(is_topic_relevant(content)):
-                new_cont[json_file]=content
-    try:    
-        with open(relevant_articles_file ,"r+") as ra:
+                new_cont[json_file] = content
+    
+    # seperate the files used for annotation and then training of the BERT Model
+    training_keys = random.sample(list(new_cont), training_size)
+    train = {k: new_cont[k] for k in new_cont if k in training_keys}
+    eval = {k: new_cont[k] for k in new_cont if k not in training_keys}
+
+    try:
+        with open(relevant_articles_base+"_evaluation.json", "r+") as ra:
             content_ra = json.load(ra)
-            content_ra.update(new_cont)
+            content_ra.update(eval)
             ra.seek(0)
-            json.dump(content_ra,ra)
+            json.dump(content_ra, ra)
+        with open(relevant_articles_base+"_training.json", "r+") as ra:
+            content_ra = json.load(ra)
+            content_ra.update(train)
+            ra.seek(0)
+            json.dump(content_ra, ra)
     except FileNotFoundError:
         # happens if new is enabled or function called the first time for a filepath
-        with open(relevant_articles_file ,"w") as raf:
-            json.dump(new_cont,raf)
+        with open(relevant_articles_base+"_evaluation.json", "w") as raf:
+            json.dump(eval, raf)
+        with open(relevant_articles_base+"_training.json", "w") as raf:
+            json.dump(train, raf)
     # print(f"All files is read. Time since start: {round((time() - t) / 60, 2)}")
 
 
@@ -99,11 +117,12 @@ def select_articles(articles):
         if is_topic_relevant(articles[url]):
             selected_articles.append(url)
     return selected_articles
-	
+
+
 if __name__ == "__main__":
     
     selected_articles = []
-    data_path='sentiment_analysis/data/focus.json'
+    data_path = 'sentiment_analysis/data/focus.json'
     
     with open(data_path, 'r') as f:
         articles = json.load(f)
