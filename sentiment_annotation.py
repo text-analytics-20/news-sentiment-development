@@ -22,7 +22,7 @@ def sentencize(texts: Sequence[str]) -> Sequence[str]:
     """
     all_sentences = []
     for doc in tqdm(nlp.pipe(texts, batch_size=40), total=len(texts), desc='Parsing sentences'):
-        sents = [s.text for s in doc.sents]
+        sents = [s.text.strip() for s in doc.sents]
         all_sentences.extend(sents)
     return all_sentences
 
@@ -91,9 +91,11 @@ def sentiment_annotation(texts: Sequence[str], output_path: str) -> None:
 
 
 def write_entry_to_csv(row: Sequence[str], csv_path: str) -> None:
-    with open(csv_path, 'a') as f:
+    with open(csv_path, 'a', encoding='utf-8', newline='') as f:
         writer = csv.writer(f, delimiter='\t')
         writer.writerow(row)
+        f.flush()
+        os.fsync(f)  # Ensure everything has been written
 
 
 def extract_texts(input_path: str) -> Sequence[str]:
@@ -108,7 +110,7 @@ def get_already_annotated(csv_path: str) -> Set[str]:
     if not os.path.exists(csv_path):
         return set()  # Return empty set if file does not already exist
     already_annoated = set()
-    with open(csv_path, 'r') as f:
+    with open(csv_path, 'r', encoding='utf-8', newline='') as f:
         reader = csv.reader(f, delimiter='\t')
         for row in reader:
             already_annoated.add(row[0])
