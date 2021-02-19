@@ -4,7 +4,7 @@ import argparse
 import csv
 import json
 import os
-from typing import Sequence
+from typing import Sequence, Set
 
 import spacy
 from tqdm import tqdm
@@ -13,22 +13,55 @@ from tqdm import tqdm
 nlp = spacy.load('de_core_news_sm')
 
 
-def has_keyword(text: str, keywords=['migra', 'flücht', 'asyl']) -> bool:
+def has_keyword(text: str, keywords=['migra', 'flüchtl', 'asyl']) -> bool:
     return any(keyword in text for keyword in keywords)
 
 
-def extract_relevant_sections(texts: Sequence[str], include_next_sentence=True) -> Sequence[str]:
-    concat_text = '\n'.join(texts)
+def sentencize(texts: Sequence[str]) -> Sequence[str]:
+    """Takes a sequence of texts and returns a list of every sentence in every text.
+    """
+    all_sentences = []
+    for doc in tqdm(nlp.pipe(texts, batch_size=40), total=len(texts), desc='Parsing sentences'):
+        sents = [s.text for s in doc.sents]
+        all_sentences.extend(sents)
+    return all_sentences
+
+
+def extract_relevant_sections(
+        texts: Sequence[str],
+        include_next_sentence: bool,
+        already_annotated: Set[str]
+) -> Sequence[str]:
+    """Extract relevant sections from articles.
+    Returns a list of sections where keywords are found.
+    
+    If ``include_next_sentence=False``, these are just the sentences
+    containing keywords.
+    If ``include_next_sentence=True``, each section additionally contains
+    the sentence after the keyword match, or multiple sentences, if they
+    also match the keyword."""
+    # Set of sentences that are skipped. Contains both already annotated sentences
+    # and additionally the sentences that are found during this section extraction
+    # process.
+    skip = already_annotated.copy()
+    sentences = sentencize(texts)
     relevant_sections = []
-    sentences = [sent.text for sent in nlp(concat_text).sents]  # TODO: Optimize this.
-    for i in tqdm(range(len(sentences))):
+    for i in range(len(sentences)):
         sentence = sentences[i]
+        if sentence in skip:
+            continue
         if has_keyword(sentence):
-            if include_next_sentence and i < len(sentences) - 1:
-                next_sentence = sentences[i + 1]
-                section = f'{sentence}\n{next_sentence}'
-            else:
-                section = sentence
+            section = sentence
+            skip.add(sentence)
+            if include_next_sentence:
+                for j in range(i + 1, len(sentences)):
+                    # Append each next sentence as a new line...
+                    next_sentence = sentences[j]
+                    section = f'{sentence}\n{next_sentence}'
+                    skip.add(next_sentence)
+                    if not has_keyword(next_sentence):
+                        # ... and repeat until the next sentence does not contain a keyword
+                        break
             relevant_sections.append(section)
 
     return relevant_sections
@@ -41,18 +74,18 @@ def sentiment_annotation(texts: Sequence[str], output_path: str) -> None:
 
     # translates input to numerical values
     translation = {'p': 0, 'n': 1, '': 2}
-    print(" == Sentiment input: p = positive, n = negative, press enter if neutral:\n")
+    print("\n == Sentiment input: p = positive, n = negative, press enter if neutral:\n")
 
-    for section in texts:
-        print(section)
-        sentiment = input()
+    for section in tqdm(texts, desc='Annotating'):
+        print(f'\n\n{section}')
+        sentiment = input('\n == Please label sentiment (p = pos, n = neg, enter: neutral): ')
 
         #check for valid input
         while sentiment not in ["n", "p", ""]:
             print(" == No valid input. p = positive, n = negative, press enter if neutral:\n")
             print(section)
             sentiment = input()
-        print('\n    ===================================\n\n')
+        print('\n =======================================================\n\n')
         entry = (section, translation[sentiment])
         write_entry_to_csv(entry, csv_path=output_path)
 
@@ -70,6 +103,18 @@ def extract_texts(input_path: str) -> Sequence[str]:
     return texts
 
 
+def get_already_annotated(csv_path: str) -> Set[str]:
+    """Gather the set of text sections that have already been annotated in a CSV."""
+    if not os.path.exists(csv_path):
+        return set()  # Return empty set if file does not already exist
+    already_annoated = set()
+    with open(csv_path, 'r') as f:
+        reader = csv.reader(f, delimiter='\t')
+        for row in reader:
+            already_annoated.add(row[0])
+    return already_annoated
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(epilog=__doc__, formatter_class=argparse.RawTextHelpFormatter)
@@ -83,9 +128,17 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    source_path = args.source_path
-    output_path = args.output_path
+    source_path = os.path.expanduser(args.source_path)
+    output_path = os.path.expanduser(args.output_path)
 
+    # Extract article text bodies from an article collection (relevant_article.json)
     texts = extract_texts(source_path)
-    relevant_sections = extract_relevant_sections(texts, include_next_sentence=True)
+    # Find what has already been annotated (so these parts can be skipped)
+    already_annoated = get_already_annotated(output_path)
+    print(f'Skipping {len(already_annoated)} sections that have already been annotated in {output_path}')
+    # Extract sections (sentences + neighborhoods) from articles where relevant keywords are found
+    relevant_sections = extract_relevant_sections(
+        texts, include_next_sentence=True, already_annotated=already_annoated
+    )
+    # Prompt user annotation input and write annotated texts with labels to output CSV file
     sentiment_annotation(relevant_sections, output_path)
