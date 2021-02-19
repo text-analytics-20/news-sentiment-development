@@ -1,6 +1,6 @@
 import spacy
 from spacy_sentiws import spaCySentiWS
-from negation_handling import *
+from sentiment_analysis.negation_handling import *
 
 # class that ranks sentiment based on a dicitionary apporach
 # based on Singelton pattern
