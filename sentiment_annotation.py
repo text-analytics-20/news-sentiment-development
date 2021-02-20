@@ -1,6 +1,7 @@
 """Tool for sentiment dataset annotation."""
 
 import argparse
+import configparser
 import csv
 import json
 import os
@@ -16,8 +17,15 @@ LABELING_PROMPT = ('\n == Please label sentiment (p = positive, n = negative, '
                    'h = hostile, enter: neutral): ')
 
 
-def has_keyword(text: str, keywords=['migra', 'flüchtl', 'asyl']) -> bool:
-    return any(keyword in text for keyword in keywords)
+# Get search keywords from config.ini found in the same directory
+config_path = os.path.join(os.path.dirname(__file__), 'config.ini')
+config = configparser.ConfigParser()
+config.read(config_path)
+SEARCH_KEYWORDS = config.get("ArticleSelection", "search_words").lower().split(", ")
+
+
+def has_keyword(text: str) -> bool:
+    return any(keyword in text for keyword in SEARCH_KEYWORDS)
 
 
 def sentencize(texts: Sequence[str]) -> Sequence[str]:
@@ -51,8 +59,8 @@ def extract_relevant_sections(
     relevant_sections = []
     for i in range(len(sentences)):
         sentence = sentences[i]
-        # if sentence in skip:
-            # continue
+        if sentence in skip:
+            continue
         if has_keyword(sentence):
             section = sentence
             skip.add(sentence)
