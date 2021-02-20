@@ -12,6 +12,9 @@ from tqdm import tqdm
 # Requires `python -m spacy download de_core_news_sm`
 nlp = spacy.load('de_core_news_sm')
 
+LABELING_PROMPT = ('\n == Please label sentiment (p = positive, n = negative, '
+                   'h = hostile, enter: neutral): ')
+
 
 def has_keyword(text: str, keywords=['migra', 'flüchtl', 'asyl']) -> bool:
     return any(keyword in text for keyword in keywords)
@@ -48,8 +51,8 @@ def extract_relevant_sections(
     relevant_sections = []
     for i in range(len(sentences)):
         sentence = sentences[i]
-        if sentence in skip:
-            continue
+        # if sentence in skip:
+            # continue
         if has_keyword(sentence):
             section = sentence
             skip.add(sentence)
@@ -73,17 +76,17 @@ def sentiment_annotation(texts: Sequence[str], output_path: str) -> None:
     output_path: path to csv file where to write annotated text entries"""
 
     # translates input to numerical values
-    translation = {'p': 0, 'n': 1, '': 2}
-    print("\n == Sentiment input: p = positive, n = negative, press enter if neutral:\n")
+    translation = {'p': 0, 'n': 1, '': 2, 'h': 3}
+    print("\n == Starting annotation")
 
     for section in tqdm(texts, desc='Annotating'):
         print(f'\n\n{section}')
-        sentiment = input('\n == Please label sentiment (p = pos, n = neg, enter: neutral): ')
+        sentiment = input(LABELING_PROMPT)
 
         #check for valid input
-        while sentiment not in ["n", "p", ""]:
-            print(" == No valid input. p = positive, n = negative, press enter if neutral:\n")
-            print(section)
+        while sentiment not in translation.keys():
+            print(LABELING_PROMPT)
+            print(f'\n\n{section}')
             sentiment = input()
         print('\n =======================================================\n\n')
         entry = (section, translation[sentiment])
@@ -137,7 +140,8 @@ if __name__ == "__main__":
     texts = extract_texts(source_path)
     # Find what has already been annotated (so these parts can be skipped)
     already_annoated = get_already_annotated(output_path)
-    print(f'Skipping {len(already_annoated)} sections that have already been annotated in {output_path}')
+    if already_annoated:
+        print(f'Skipping {len(already_annoated)} sections that have already been annotated in {output_path}')
     # Extract sections (sentences + neighborhoods) from articles where relevant keywords are found
     relevant_sections = extract_relevant_sections(
         texts, include_next_sentence=True, already_annotated=already_annoated
