@@ -71,6 +71,9 @@ def write_relevant_content_to_file(file_list, relevant_articles_base, search_key
             if(is_topic_relevant(content)):
                 new_cont[json_file] = content
     
+    print(f"Total number of relavant articles: {len(new_cont)}")
+    print(f"Size of training set: {training_size}")
+    print(f"    -> {training_size//3} articles per annotation file")
     # seperate the files used for annotation and then training of the BERT Model
     # 1. seed the random number generator for reproducable results
     random.seed(seed)
