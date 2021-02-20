@@ -70,7 +70,7 @@ if __name__ == "__main__":
         end_year = config.getint("ArticleSelection", "end_year")
         data_path_list = [base_path+str(year)+"/" for year in range(start_year, end_year+1)]
         training_size = config.getint("ArticleSelection", "training_size")
-        search_keywords = config.get("ArticleSelection", "search_words").lower().split(",")
+        search_keywords = config.get("ArticleSelection", "search_words").lower().split(", ")
         seed = config.getint("ArticleSelection", "seed")
         # create list of all data paths
         json_file_list = []
