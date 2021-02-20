@@ -25,7 +25,7 @@ SEARCH_KEYWORDS = config.get("ArticleSelection", "search_words").lower().split("
 
 
 def has_keyword(text: str) -> bool:
-    return any(keyword in text for keyword in SEARCH_KEYWORDS)
+    return any(keyword in text.lower() for keyword in SEARCH_KEYWORDS)
 
 
 def sentencize(texts: Sequence[str]) -> Sequence[str]:
