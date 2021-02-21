@@ -117,14 +117,17 @@ def extract_texts(input_path: str) -> Sequence[str]:
 
 
 def get_already_annotated(csv_path: str) -> Set[str]:
-    """Gather the set of text sections that have already been annotated in a CSV."""
+    """Gather the set of sentences that have already been annotated in a CSV."""
     if not os.path.exists(csv_path):
         return set()  # Return empty set if file does not already exist
     already_annoated = set()
     with open(csv_path, 'r', encoding='utf-8', newline='') as f:
         reader = csv.reader(f, delimiter='\t')
-        for row in reader:
-            already_annoated.add(row[0])
+        for text, label in reader:
+            # Split into individual sentences
+            sents = nlp(text).sents
+            for sent in sents:
+                already_annoated.add(sent.text)
     return already_annoated
 
 
@@ -149,7 +152,7 @@ if __name__ == "__main__":
     # Find what has already been annotated (so these parts can be skipped)
     already_annoated = get_already_annotated(output_path)
     if already_annoated:
-        print(f'Skipping {len(already_annoated)} sections that have already been annotated in {output_path}')
+        print(f'Skipping {len(already_annoated)} sentences that have already been annotated in {output_path}')
     # Extract sections (sentences + neighborhoods) from articles where relevant keywords are found
     relevant_sections = extract_relevant_sections(
         texts, include_next_sentence=True, already_annotated=already_annoated
