@@ -68,7 +68,7 @@ def extract_relevant_sections(
                 for j in range(i + 1, len(sentences)):
                     # Append each next sentence as a new line...
                     next_sentence = sentences[j]
-                    section = f'{sentence}\n{next_sentence}'
+                    section = f'{section}\n{next_sentence}'
                     skip.add(next_sentence)
                     if not has_keyword(next_sentence):
                         # ... and repeat until the next sentence does not contain a keyword
