@@ -70,14 +70,22 @@ if __name__ == "__main__":
         end_year = config.getint("ArticleSelection", "end_year")
         data_path_list = [base_path+str(year)+"/" for year in range(start_year, end_year+1)]
         training_size = config.getint("ArticleSelection", "training_size")
-        search_keywords = config.get("ArticleSelection","search_words").lower().split(",")
+        search_keywords = config.get("ArticleSelection", "search_words").lower().split(", ")
+        seed = config.getint("ArticleSelection", "seed")
         # create list of all data paths
         json_file_list = []
         for path in data_path_list:
             json_file_list +=  [file_path for file_path in glob.glob(path+"*.json")]
         
-        # open all files containing an article and if the topic is relevannt save it to a collectiv json file 
-        article_selection.write_relevant_content_to_file(json_file_list,output_base, search_keywords = search_keywords, new=True, training_size=training_size)
+        # open all files containing an article 
+        # check if the topic is relevannt
+        # output is split in four files: 
+        #   1. evaluation (size_all-training_size)
+        #   2. 3 annotation files with the names of the annotators 1/3 training_size
+        article_selection.write_relevant_content_to_file(json_file_list, output_base, 
+                                                         search_keywords=search_keywords,
+                                                         new=True, training_size=training_size
+                                                         , seed=seed)
     
     # ===================
     # Word2Vec analysis
