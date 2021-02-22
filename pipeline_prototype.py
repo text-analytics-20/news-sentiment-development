@@ -72,6 +72,8 @@ if __name__ == "__main__":
         training_size = config.getint("ArticleSelection", "training_size")
         search_keywords = config.get("ArticleSelection", "search_words").lower().split(", ")
         seed = config.getint("ArticleSelection", "seed")
+        create_new_files =  not config.getboolean("ArticleSelection", "append_to_existing_file")
+        use_annotation =  config.getboolean("ArticleSelection", "use_annotation")
         # create list of all data paths
         json_file_list = []
         for path in data_path_list:
@@ -84,8 +86,8 @@ if __name__ == "__main__":
         #   2. 3 annotation files with the names of the annotators 1/3 training_size
         article_selection.write_relevant_content_to_file(json_file_list, output_base, 
                                                          search_keywords=search_keywords,
-                                                         new=True, training_size=training_size
-                                                         , seed=seed)
+                                                         new=create_new_files, training_size=training_size
+                                                         , seed=seed, annotation=use_annotation)
     
     # ===================
     # Word2Vec analysis
