@@ -6,9 +6,15 @@ from gensim.models.phrases import Phrases, Phraser
 import multiprocessing
 from gensim.models import Word2Vec
 from time import time
-import logging  # Setting up the loggings to monitor gensim
+
+# Setting up the loggings to monitor gensim
+import logging  
 logging.basicConfig(format="%(levelname)s - %(asctime)s: %(message)s", datefmt= '%H:%M:%S', level=logging.WARN)
 
+
+# workaround for ValueError in pandas.read_json found on :
+# https://stackoverflow.com/questions/61732956/pandas-read-json-with-int64-values-raises-valueerror-value-is-too-big
+pd.io.json._json.loads = lambda s, *a, **kw: json.loads(s)
 
 class SentiW2v:
     text = None
@@ -33,19 +39,21 @@ class SentiW2v:
 
     def set_text_from_file(self,path):
         df = pd.read_json(path, orient='index')        
-        #self.df = self.df[["date","og","text"]]
+        # self.df = self.df[["date","og","text"]]
         self.text=df["text"]
 
     def set_text_from_pandas(self, data):#
         df = data
-        #self.df = df[["date","og","text"]]
+        # self.df = df[["date","og","text"]]
         self.text=df["text"]
 
     def clean_and_train(self):
         brief_cleaning = (re.sub("[^A-Za-züäöÜÄÖß']",' ', str(row)).lower() for row in self.text)
-        print(len(self.text))
-        t=time()
-        txt= [self.cleaning(doc) for doc in self.nlp.pipe(brief_cleaning, batch_size=50,n_threads=-1)]
+        print(f"Text length: {len(self.text)}")
+        if len(self.text) == 0:
+            return
+        t = time()
+        txt = [self.cleaning(doc) for doc in self.nlp.pipe(brief_cleaning, batch_size=50,n_threads=-1)]
         print('Time to clean up everything: {} mins'.format(round((time() - t) / 60, 2)))
 
         df_clean = pd.DataFrame({'clean': txt})
@@ -82,7 +90,15 @@ class SentiW2v:
 
 
 def similarity_by_year(input_path :  str,output_path : str, search_words : list, start_year=2007, end_year=2015):
-    content=pd.read_json(input_path, orient="index")
+    try:
+        content = pd.read_json(input_path, orient="index", precise_float=True) # , numpy=True)
+    except ValueError:
+        print("oh shit ValueError")
+        return
+        # with open(input_path, "r") as f:
+        #     cont = json.load(f)
+
+        content 
     content=content[["date","og","text","url"]]
     most_sim={}
     content["date"]=content['date'].astype('str')
