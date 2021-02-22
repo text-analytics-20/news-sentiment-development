@@ -32,7 +32,7 @@ class SentiW2v:
     def cleaning(self,doc):
         # lemma of all stop words 
         
-        txt=[token.lemma_ for token in doc if not token.is_stop]
+        txt = [token.lemma_ for token in doc if not token.is_stop]
         # if sentence has more than 3 words
         if len(txt)>2:
             return ' '.join(txt)
@@ -82,6 +82,7 @@ class SentiW2v:
             print(self.w2v_model.wv.most_similar(word))
         except KeyError:
             print(f"The word {word} is not in the in vocabulary.")
+
     def get_most_similar(self,word):
         try:
             return self.w2v_model.wv.most_similar(word)
@@ -90,6 +91,11 @@ class SentiW2v:
 
 
 def similarity_by_year(input_path :  str,output_path : str, search_words : list, start_year=2007, end_year=2015):
+    # lemmatize the search words
+    search_doc = self.nlp(" ".join(search_words))
+    search_words = [token.lemma_ for token in search_doc]
+    
+
     try:
         content = pd.read_json(input_path, orient="index", precise_float=True) # , numpy=True)
     except ValueError:
@@ -98,9 +104,9 @@ def similarity_by_year(input_path :  str,output_path : str, search_words : list,
         # with open(input_path, "r") as f:
         #     cont = json.load(f)
 
-        content 
-    content=content[["date","og","text","url"]]
-    most_sim={}
+    content = content[["date","text","url"]]
+    most_sim = {}
+
     content["date"]=content['date'].astype('str')
     for year in range(start_year,end_year+1):
         print(f"\nStart analysis for year {year}")
@@ -114,10 +120,10 @@ def similarity_by_year(input_path :  str,output_path : str, search_words : list,
     with open(output_path+"_by_year.json","w") as f:
         json.dump(most_sim,f)
 
-def similarity_by_publisher(input_path : str,output_path : str, search_words : list, start_year=2007, end_year=2015):
-    content=pd.read_json(input_path, orient="index")
-    content=content[["date","og","text","url"]]
-    most_sim={}
+def similarity_by_publisher(input_path: str,output_path: str, search_words: list, start_year=2007, end_year=2015):
+    content = pd.read_json(input_path, orient="index")
+    content = content[["date","og","text","url"]]
+    most_sim = {}
     list_publishers = []
     for i , row in content.iterrows():
         try:

@@ -75,8 +75,21 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
             data[url]['sentiment_finetuned_sentibert'] = sentiment_finetuned_sentibert
 
     with open(output_path, "w", encoding='utf-8') as f:
+        print("Write data to json")
         json.dump(data, f, default=str, ensure_ascii=False)
-
+   
+    with open(output_path[:-4]+"csv", "w") as dataFilecsv:
+        print("Write data to csv:")
+        writer = csv.writer(dataFilecsv)
+        writer.writerow([
+            'url', 'publisher', 'title',
+            'text', 'sentiment_sentiws',
+            'generic_sentibert',
+            'sentiment_finetuned_sentibert'])
+        for url in list(data):
+            row = [url]
+            row += [data[url][key] for key in list(data[url])]
+            writer.writerow(row)
 
 if __name__ == "__main__":
 
@@ -128,7 +141,7 @@ if __name__ == "__main__":
         if config.getboolean("Analysis","run_by_publisher"):
             similarity_by_publisher(input_file, base_output_path ,search_words, start_year, end_year)
         if config.getboolean("Analysis","run_by_publisher_by_year"):
-            similarity_by_year_and_publisher(input_file, base_output_path ,search_words, start_year, end_year)
+            similarity_by_year_and_publisher(input_file, base_output_path, search_words, start_year, end_year)
     
     # ==================
     # Sentiment analysis
