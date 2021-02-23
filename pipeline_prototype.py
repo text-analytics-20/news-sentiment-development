@@ -39,7 +39,7 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
     list_len = len(content["text"])
     print("Start calculating sentiment")
     print(f"Total number of articles is: {list_len}")
-    for url, row in tqdm(content.iterrows(), total=list_len, dynamic_ncols=True):
+    for p, row in tqdm(content.iterrows(), total=list_len, dynamic_ncols=True):
         # if counter%output_after==0:
         #     print(f"{counter} of the files are read. {round(float(counter)/list_len*100 , 1)}% Time since start: {round((time() - t) / 60, 2)} min")
         #     print(f"Approximate time till end is: {round((list_len/float(counter) * (time() - t)-(time() - t)) / 60 , 2)} min") 
@@ -49,6 +49,7 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
             publisher = row["url"].split("//")[1].split("/")[0].split(".")[1]
             date = row['date']
             title = row['title']
+            url = row['url']
         except KeyError:
             traceback.print_exc()
             continue
@@ -73,8 +74,8 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
             sentiment_finetuned_sentibert = finetuned_sentibert.analyse_sentiment(text)
             data[url]['sentiment_finetuned_sentibert'] = sentiment_finetuned_sentibert
 
-    with open(output_path, "w") as dataFile:
-        json.dump(dataFile, data)
+    with open(output_path, "w", encoding='utf-8') as f:
+        json.dump(data, f, default=str, ensure_ascii=False)
 
 
 if __name__ == "__main__":
