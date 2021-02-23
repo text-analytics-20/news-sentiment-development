@@ -17,9 +17,12 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
 
-class GSBertPolarityModel():
-    """Code adapted from
-    https://github.com/oliverguhr/german-sentiment-lib/blob/4e5158/germansentiment/sentimentmodel.py"""
+class GSBertPolarityModel:
+    """Code based on
+    https://github.com/oliverguhr/german-sentiment-lib/blob/4e5158/germansentiment/sentimentmodel.py
+    
+    Prediction output form changed from argmax output to polarity score to make it
+    more comparable to SentiWS."""
 
     def __init__(self, model_name: str = "oliverguhr/german-sentiment-bert"):
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
@@ -35,7 +38,7 @@ class GSBertPolarityModel():
             .replace("6"," sechs").replace("7"," sieben").replace("8"," acht") \
             .replace("9"," neun")         
 
-    def clean_text(self,text: str)-> str:    
+    def clean_text(self,text: str) -> str:    
         text = text.replace("\n", " ")        
         text = self.clean_http_urls.sub('',text)
         text = self.clean_at_mentions.sub('',text)        
@@ -46,7 +49,7 @@ class GSBertPolarityModel():
         return text
 
     @staticmethod
-    def probs2polarities(pnn):
+    def probs2polarities(pnn: torch.Tensor) -> torch.Tensor:
         """Transform softmax probs of a [positive, negative, neutral] classifier
         into scalar polarity scores of range [-1, 1].
         High values express positive sentiment, low negative ones negative sentiment.
@@ -58,7 +61,7 @@ class GSBertPolarityModel():
         polarities = pos - neg
         return polarities
 
-    def predict_sentiment(self, texts: List[str])-> List[str]:
+    def predict_sentiment_batch(self, texts: List[str]) -> torch.Tensor:
         texts = [self.clean_text(text) for text in texts]
         # Add special tokens takes care of adding [CLS], [SEP], <s>... tokens in the right way for each model.
         input_ids = self.tokenizer.batch_encode_plus(texts, padding=True, add_special_tokens=True)
@@ -67,13 +70,18 @@ class GSBertPolarityModel():
         with torch.no_grad():
             logits = self.model(input_ids)
             probs = F.softmax(logits[0], dim=1)
-            # print(probs)
         
         polarities = self.probs2polarities(probs)
         return polarities
 
+    def analyse_sentiment(self, text: str) -> float:
+        polarity = self.predict_sentiment_batch([text]).item()
+        return polarity
+
 
 if __name__ == '__main__':
     model = GSBertPolarityModel()
-    s = model.predict_sentiment(['Du hirnloser Vollidiot!', 'Ich mag dich sehr.'])
+    s = model.predict_sentiment_batch(['Du hirnloser Vollidiot!', 'Ich mag dich sehr.'])
     print(s)
+    p = model.analyse_sentiment('Dieser Satz ist relativ neutral. Dieser hier auch.')
+    print(p)
