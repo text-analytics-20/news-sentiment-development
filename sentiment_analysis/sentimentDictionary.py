@@ -53,6 +53,7 @@ class SentimentDictionary():
             # new sentiment is calculated for every function call
             self.sentimentText = 0.0
         doc = self.nlp(text)
+        counter = 1
         for sentence in doc.sents:
             sentenceText = sentence.text
             if any(term in sentenceText.lower() for term in searchTermList):
@@ -66,13 +67,14 @@ class SentimentDictionary():
                         self.count_this(self.compound, word.text)
                         continue
                     if word._.sentiws is not None:
+                        counter += 1
                         # if word has a sentiment weight it is added to the sentiment value 
                         sentimentSentence += float(word._.sentiws) * check_for_negation(sentence,word)
                         # print(word, word._.sentiws, check_for_negation(sentence,word))
                 if self.saveSentencesWithSentiment:
                     self.count_this(self.sentencesWithSentiment, sentenceText, sentimentSentence)
                 self.sentimentText += sentimentSentence
-        return self.sentimentText
+        return self.sentimentText/counter
 
     def count_this(self, dictionary: dict, key: str, value: float = 1.0):
         # adds the given value or 1 to the key in the provided dictionary

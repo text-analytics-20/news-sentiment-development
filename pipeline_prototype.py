@@ -32,9 +32,10 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
     
     content = pd.read_json(input_path, orient="index")
     content = content[["date", "og", "text", "url", "title"]]
+    # content = content.sample(2000)
     data = {}
     # counter=1
-    output_after = 200
+    #output_after = 200
     t = time()
     list_len = len(content["text"])
     print("Start calculating sentiment")
@@ -75,21 +76,21 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
             data[url]['sentiment_finetuned_sentibert'] = sentiment_finetuned_sentibert
 
     with open(output_path, "w", encoding='utf-8') as f:
-        print("Write data to json")
+        print(f"Write data to {output_path}")
         json.dump(data, f, default=str, ensure_ascii=False)
    
-    with open(output_path[:-4]+"csv", "w") as dataFilecsv:
-        print("Write data to csv:")
-        writer = csv.writer(dataFilecsv)
-        writer.writerow([
-            'url', 'publisher', 'title',
-            'text', 'sentiment_sentiws',
-            'generic_sentibert',
-            'sentiment_finetuned_sentibert'])
-        for url in list(data):
-            row = [url]
-            row += [data[url][key] for key in list(data[url])]
-            writer.writerow(row)
+    # with open(output_path[:-4]+"csv", "w") as dataFilecsv:
+    #     print("Write data to csv:")
+    #     writer = csv.writer(dataFilecsv)
+    #     writer.writerow([
+    #         'url', 'publisher', 'title',
+    #         'text', 'sentiment_sentiws',
+    #         'generic_sentibert',
+    #         'sentiment_finetuned_sentibert'])
+    #     for url in list(data):
+    #         row = [url]
+    #         row += [data[url][key] for key in list(data[url])]
+    #         writer.writerow(row)
 
 if __name__ == "__main__":
 
@@ -136,6 +137,7 @@ if __name__ == "__main__":
         base_output_path = config.get("Analysis","output_base_w2v")
         start_year = config.getint("Analysis","start_year")
         end_year = config.getint("Analysis","end_year")
+
         if config.getboolean("Analysis","run_by_year"):
             similarity_by_year(input_file, base_output_path, search_words, start_year, end_year)
         if config.getboolean("Analysis","run_by_publisher"):
