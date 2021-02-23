@@ -1,6 +1,6 @@
 newspaper3k
 tqdm
-spacy
+spacy<3
 spacy-sentiws
 plotly
 pandas
