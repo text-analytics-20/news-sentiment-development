@@ -49,7 +49,7 @@ class SentimentDictionary():
 
     def predict_sentiment(self, text: str, searchTermList: list) -> float:
         if not self.sentimentTextIsAdditiv:
-            print("alkdfwj")
+            # print("alkdfwj")
             # new sentiment is calculated for every function call
             self.sentimentText = 0.0
         doc = self.nlp(text)
@@ -68,7 +68,7 @@ class SentimentDictionary():
                     if word._.sentiws is not None:
                         # if word has a sentiment weight it is added to the sentiment value 
                         sentimentSentence += float(word._.sentiws) * check_for_negation(sentence,word)
-                        print(word, word._.sentiws, check_for_negation(sentence,word))
+                        # print(word, word._.sentiws, check_for_negation(sentence,word))
                 if self.saveSentencesWithSentiment:
                     self.count_this(self.sentencesWithSentiment, sentenceText, sentimentSentence)
                 self.sentimentText += sentimentSentence
