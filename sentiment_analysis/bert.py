@@ -64,7 +64,12 @@ class GSBertPolarityModel:
     def predict_sentiment_batch(self, texts: List[str]) -> torch.Tensor:
         texts = [self.clean_text(text) for text in texts]
         # Add special tokens takes care of adding [CLS], [SEP], <s>... tokens in the right way for each model.
-        input_ids = self.tokenizer.batch_encode_plus(texts, padding=True, add_special_tokens=True)
+        input_ids = self.tokenizer.batch_encode_plus(
+            texts,
+            padding=True,
+            add_special_tokens=True,
+            truncation=True  # Ensure that the text does not exceed the token limit
+        )
         input_ids = torch.tensor(input_ids["input_ids"])
 
         with torch.no_grad():
