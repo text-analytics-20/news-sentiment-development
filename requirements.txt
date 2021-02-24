@@ -2,7 +2,6 @@ newspaper3k
 tqdm
 spacy<3
 spacy-sentiws
-plotly
 pandas
 regex
 gensim
@@ -10,3 +9,7 @@ gensim
 # For BERT model
 transformers
 torch
+
+#For Plotting
+plotly
+statsmodels
