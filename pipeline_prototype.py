@@ -1,8 +1,8 @@
 #!/usr/bin/env python3.8
 
 """
-Prototype for a pipeline. It is contoled by a config.ini file 
-and calles the functions for preprocessing and analysis. 
+Prototype for a pipeline. It is controlled by a config.ini file
+and calls the functions for preprocessing and analysis.
 """
 
 import configparser
@@ -34,7 +34,9 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
     # get the data from the given file path 
     content = pd.read_json(input_path, orient="index")
     content = content[["date", "text", "url", "title"]]
-    content = content.sample(20)
+
+    content = content.sample(20)  # For a quick test run: use only a few samples. TODO: Remove later
+
     # create dictionary with output data
     data = {}
 
@@ -77,7 +79,7 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
             sentiment_generic_sentibert = generic_sentibert.analyse_sentiment(text)
             data[url]['sentiment_generic_sentibert'] = sentiment_generic_sentibert
             
-        # 3. use the self traind bert model
+        # 3. use the self trained bert model
         if 'finetuned_sentibert' in methods:
             raise NotImplementedError  # TODO
             sentiment_finetuned_sentibert = finetuned_sentibert.analyse_sentiment(text)
