@@ -13,6 +13,7 @@ import sentiment_analysis.sentimentDictionary as sd
 from sentiment_analysis.bert import GSBertPolarityModel
 import article_selection.article_selection as article_selection
 import json
+import csv
 import sys
 import os
 from time import time
@@ -22,14 +23,16 @@ import traceback
 import pandas as pd
 
 
+FTS_PATH = './data/finetuned-sentibert-checkpoint-225/'
+
+
 def calulate_sentiment(input_path: str, output_path: str, search_words: list, methods: Sequence[str]):
     # Initialize BERT models
     generic_sentibert, finetuned_sentibert = None, None
     if 'generic_sentibert' in methods:
         generic_sentibert = GSBertPolarityModel("oliverguhr/german-sentiment-bert")
     if 'finetuned_sentibert' in methods:
-        raise NotImplementedError  # TODO
-        finetuned_sentibert = GSBertPolarityModel('path-to-model')
+        finetuned_sentibert = GSBertPolarityModel(FTS_PATH)
     
     # get the data from the given file path 
     content = pd.read_json(input_path, orient="index")
@@ -81,7 +84,6 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
             
         # 3. use the self trained bert model
         if 'finetuned_sentibert' in methods:
-            raise NotImplementedError  # TODO
             sentiment_finetuned_sentibert = finetuned_sentibert.analyse_sentiment(text)
             data[url]['sentiment_finetuned_sentibert'] = sentiment_finetuned_sentibert
 
@@ -89,6 +91,66 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
     with open(output_path, "w", encoding='utf-8') as f:
         print(f"Write data to {output_path}")
         json.dump(data, f, default=str, ensure_ascii=False)
+
+
+def eval_sentiment(
+        senti_eval_input: str,
+        senti_eval_output: str,
+        search_words: list,
+        methods: Sequence[str]
+):
+    print(f'Evaluation sentiment analysis methods on {senti_eval_input}')
+    # Initialize BERT models
+    generic_sentibert, finetuned_sentibert = None, None
+    if 'generic_sentibert' in methods:
+        generic_sentibert = GSBertPolarityModel("oliverguhr/german-sentiment-bert")
+    if 'finetuned_sentibert' in methods:
+        finetuned_sentibert = GSBertPolarityModel(FTS_PATH)
+
+    label_remap = {3: 1}  # Analogous to training setup: remap "hostile" to "negative"
+    texts = []
+    labels = []
+    with open(senti_eval_input, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f, delimiter='\t')
+        for row in reader:
+            if len(row) != 2:
+                raise ValueError('Invalid row encountered.')
+            text = row[0]
+            label = int(row[1])
+            # If the label has an entry in the label_remap dict,
+            # it is remapped accordingly. Else, the label is kept.
+            label = label_remap.get(label, label)
+            texts.append(text)
+            labels.append(label)
+
+    # create dictionary with output data
+    results = {}
+
+    for text, label in tqdm(zip(texts, labels), total=len(texts), dynamic_ncols=True):
+
+        # TODO: Calculate metrics, store in results dict, print them.
+        #       Currently this code does nothing.
+
+        # 1. use the sentiment dictionary "sentiws"
+        if 'sentiws' in methods:
+            sentiment_sentiws = sd.analyse_sentiment(text, search_words)
+            if sentiment_sentiws == '':
+                sentiment_sentiws = float('nan')
+            else:
+                sentiment_sentiws = float(sentiment_sentiws)
+
+        # 2. use the generic bert model
+        if 'generic_sentibert' in methods:
+            sentiment_generic_sentibert = generic_sentibert.analyse_sentiment(text)
+
+        # 3. use the self trained bert model
+        if 'finetuned_sentibert' in methods:
+            sentiment_finetuned_sentibert = finetuned_sentibert.analyse_sentiment(text)
+
+    # write data to file
+    with open(senti_eval_output, "w", encoding='utf-8') as f:
+        print(f"Write data to {senti_eval_output}")
+        json.dump(results, f, default=str, ensure_ascii=False)
 
 
 if __name__ == "__main__":
@@ -188,4 +250,25 @@ if __name__ == "__main__":
         calulate_sentiment(input_file, output_file,
                            search_words, methods=methods)
 
-                        
+        # =============================
+        # Sentiment analysis evaluation
+        # =============================
+        if config.getboolean("Analysis", "run_senti_eval"):
+            senti_eval_input = config.get("Analysis", "senti_eval_input")
+            search_words = config.get("Analysis", "search_words").lower().split(",")
+            senti_eval_output = config.get("Analysis", "senti_eval_output")
+            methods = config.get('Analysis', 'senti_methods').lower().split(", ")
+
+            # Perform quantitative evaluation of sentiment analysis approaches
+            # using one or multiple of the following methods:
+            #   1. Sentiment-Dictionary (sentiws)
+            #   2. Neuronal-Network based Bert model
+            #      trained for gerneral sentiment analysis
+            #   3. Same Bert model with additional training
+            #      using labeled parts of news-articles about refugees
+            eval_sentiment(
+                senti_eval_input,
+                senti_eval_output,
+                search_words,
+                methods=methods
+            )
