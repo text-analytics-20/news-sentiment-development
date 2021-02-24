@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Proof of concept code for filtering an article collection (obtained from
+Code for filtering an article collection (obtained from
 running scraping/scrape.py) by relevant search keywords.
-Prints the source URLs of articles that are recognized as relevant for our
-project.
 """
 
 import json
@@ -15,10 +13,19 @@ from tqdm import tqdm
 
 def is_topic_relevant(article, keywords: list = ['migra', 'flücht', 'asyl']):
     """decides whether an article is topic relevant or not"""
+    if not isinstance(article,dict):
+        raise TypeError("article must be a dictionary")
+    if not keywords or not isinstance(keywords, list) or not all(isinstance(kw,str) for kw in keywords) :
+        raise TypeError("keywords must be non empty list of strings")
+    
     try:
         search_corpus = article['news_keywords'].lower() # not every article has the attribute news_keywords
     except KeyError:
-        search_corpus = article['title'].lower() + article['text'].lower() # article['description'] could be considered as well if attribute available
+        try:
+            search_corpus = article['title'].lower() + article['text'].lower() # article['description'] could be considered as well if attribute available
+        except KeyError:
+            # File has different structur than the used article files 
+            return False
     except AttributeError:
         print(f"ERROR: News Keywords are {article['news_keywords']}")
         return False
@@ -32,43 +39,35 @@ def is_topic_relevant(article, keywords: list = ['migra', 'flücht', 'asyl']):
     else:
         return False
 
-""" def select_single_article(article,listSelectedArticles):
-    ''' Calls is_topic_relevant() checks if a timestamp is available for
-    input article.
-    Appends relevant articles to a given list of selected articles
-    returns the list to enable recursive usage'''
-
-    # check if there is a timestamp and a news outlett name
-    try: 
-        articles[url]['date']
-        articles[url]["og"]["site_name"]
-    except KeyError:
-        return
-    
-    # check topic relevance
-    if is_topic_relevant(article):
-            listSelectedArticles.append(url)
-    return listSelectedArticles
-"""
-
 
 def write_relevant_content_to_file(file_list, relevant_articles_base, search_keywords, 
-                                   new=False, training_size: int=1000, 
-                                   output_after=5000, seed=0, annotation = True):
+                                   new=False, annotation=False,
+                                   training_size: int = 1000, 
+                                   seed=0):
+    """
+    opens all files and saves them to a collectiv json if they are topic relevant
+    additionaly data for annotation can be seperated
+    """
+
     if new:
+        # if file already exists remove it
         try:
             os.remove(relevant_articles_base+"_evaluation.json")
             os.remove(relevant_articles_base+"_training.json")
         except FileNotFoundError:
-            print("file does already not exist")
+            pass
 
     print(f"Start selecting files. Number of files: {len(file_list)}")
+    print(f"Keywords used for selection are: {search_keywords}")
     new_cont = {}
     for json_file in tqdm(file_list):
-        with open(json_file, "r") as jf:
-            content = json.load(jf)
-            if(is_topic_relevant(content)):
-                new_cont[json_file] = content
+        try:
+            with open(json_file, "r") as jf:
+                content = json.load(jf)
+                if(is_topic_relevant(content)):
+                    new_cont[json_file] = content
+        except FileNotFoundError:
+            pass
     
     print(f"Total number of relavant articles: {len(new_cont)}")
     if annotation:
@@ -116,6 +115,7 @@ def write_relevant_content_to_file(file_list, relevant_articles_base, search_key
                 content_ra.update(ann_martin)
                 ra.seek(0)
                 json.dump(content_ra, ra)
+
     except FileNotFoundError:
         # happens if new is enabled or function called the first time for a filepath
         with open(relevant_articles_base+"_evaluation.json", "w") as raf:
@@ -128,36 +128,3 @@ def write_relevant_content_to_file(file_list, relevant_articles_base, search_key
             with open(relevant_articles_base+"_annotation_martin.json", "w") as raf:
                 json.dump(ann_martin, raf)
     print(f"All files are written.")
-
-
-def select_articles(articles):
-    """Calls is_topic_relevant() and checks if a timestamp is available for
-    each input article.
-    Returns a list of selected relevant articles"""
-    selected_articles = []
-    for url in articles.keys():
-        # check if there is a timestamp and a news outlett name
-        try: 
-            articles[url]['date']
-            articles[url]["og"]["site_name"]
-        except KeyError:
-            continue
-            
-        # check topic relevance
-        if is_topic_relevant(articles[url]):
-            selected_articles.append(url)
-    return selected_articles
-
-
-if __name__ == "__main__":
-    
-    selected_articles = []
-    data_path = 'sentiment_analysis/data/focus.json'
-    
-    with open(data_path, 'r') as f:
-        articles = json.load(f)
-        selected_articles = select_articles(articles)
-
-    for url in selected_articles:
-        # print(articles[url].keys())
-        print(articles[url]["og"]["site_name"])

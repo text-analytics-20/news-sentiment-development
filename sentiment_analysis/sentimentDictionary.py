@@ -52,7 +52,7 @@ class SentimentDictionary():
     # main function
     # takes the text and a list of search Terms
     def predict_sentiment(self, text: str, searchTermList: list) -> float:
-        
+       
         if not self.sentimentTextIsAdditiv:
             # new sentiment is calculated for every function call
             self.sentimentText = 0.0
@@ -88,7 +88,7 @@ class SentimentDictionary():
                     # save the sentences with sentiment 
                     self.count_this(self.sentencesWithSentiment, sentenceText, sentimentSentence)
                 self.sentimentText += sentimentSentence
-        if counter>0:
+        if counter > 0:
             self.sentimentText /= counter 
         return self.sentimentText
 
@@ -101,16 +101,20 @@ class SentimentDictionary():
             dictionary[key] = value
 
 
-def analyse_sentiment(text: str, listSearchTerms: list) -> float:
-    if not any([searchTerm in text.lower() for searchTerm in listSearchTerms]):
+def analyse_sentiment(text: str, search_terms: list) -> float:
+    if not isinstance(text, str):
+        raise TypeError(f"analyse sentiment takes a string")
+    if not search_terms or not isinstance(search_terms, list) or not all(isinstance(entry, str) for entry in search_terms):
+        raise TypeError(f"analyse sentiment takes a list of str")
+
+    if not any([searchTerm in text.lower() for searchTerm in search_terms]):
         return 0.0
     sd = SentimentDictionary.getInstance()
-    sd.predict_sentiment(text, listSearchTerms)
+    sd.predict_sentiment(text, search_terms)
     return sd.sentimentText
 
 
 if __name__ == "__main__":
-    
     texts = ["Flüchtlinge nehmen uns die Arbeitsplätze weg.",
              "Wir müssen uns gemeinsam anstregenen Flüchtlinge gut zu intigrieren.",
              "Wir schaffen das!", 
