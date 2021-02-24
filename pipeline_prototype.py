@@ -39,7 +39,7 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
     content = pd.read_json(input_path, orient="index")
     content = content[["date", "text", "url", "title"]]
 
-    content = content.sample(20)  # For a quick test run: use only a few samples. TODO: Remove later
+    # content = content.sample(20)  # For a quick test run: use only a few samples.
 
     # create dictionary with output data
     data = {}
