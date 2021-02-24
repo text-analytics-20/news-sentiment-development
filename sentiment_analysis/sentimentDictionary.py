@@ -3,8 +3,8 @@ from spacy_sentiws import spaCySentiWS
 from sentiment_analysis.negation_handling import *
 
 # class that ranks sentiment based on a dicitionary apporach
-# based on Singelton pattern
-
+# based on sentiws by the leibzig university
+# implemented using a Singelton pattern
 
 class SentimentDictionary():
     __instance = None
@@ -47,31 +47,43 @@ class SentimentDictionary():
         # This can be disabled for faster runtime or less memory usage
         self.saveSentencesWithSentiment = Boolean
 
+    # main function 
+    # takes the text and a list of search Terms
     def predict_sentiment(self, text: str, searchTermList: list) -> float:
+        
         if not self.sentimentTextIsAdditiv:
-            # print("alkdfwj")
             # new sentiment is calculated for every function call
             self.sentimentText = 0.0
+
+        # read the text into spacy
         doc = self.nlp(text)
+
+        # the counter is used for normalization 
         counter = 1
+
+        # iterate through all sentences in the document
         for sentence in doc.sents:
             sentenceText = sentence.text
+
+            # to get a sentiment related to the search terms only sentences
+            # containing a search term are evaluated
             if any(term in sentenceText.lower() for term in searchTermList):
                 if sentenceText in self.sentencesWithSentiment:
+                    # check that sentences are not entered twice
                     continue
-                # only work with sentences that contain the serachTerm
                 sentimentSentence = 0.0
                 for word in sentence:
                     if any(term in word.text.lower() for term in searchTermList):
-                        # save the word that contained the serach term and skip sentiment analysis on this word
+                        # The sentiment of search terms is neglected to reduce bias
                         self.count_this(self.compound, word.text)
                         continue
                     if word._.sentiws is not None:
                         counter += 1
                         # if word has a sentiment weight it is added to the sentiment value 
+                        # and the counter in increased
                         sentimentSentence += float(word._.sentiws) * check_for_negation(sentence,word)
-                        # print(word, word._.sentiws, check_for_negation(sentence,word))
                 if self.saveSentencesWithSentiment:
+                    # save the sentences with sentiment 
                     self.count_this(self.sentencesWithSentiment, sentenceText, sentimentSentence)
                 self.sentimentText += sentimentSentence
         return self.sentimentText/counter
