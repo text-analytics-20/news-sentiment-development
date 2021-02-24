@@ -32,7 +32,7 @@ def dash_plot(filepath):
 		html.Div(className='row',
 		         children=[
 		            html.Div(children=[
-		                         html.H2('Sentiment Development Refugees'),
+		                         html.H2('Sentiment Development on the example of "Migration" '),
 		                         html.P('Pick one or more publishers and sentiment types from the dropdown below.'),
 		                         html.Div(
 		                             children=[
@@ -91,11 +91,11 @@ def dash_plot(filepath):
 	    data = [val for sublist in traces for val in sublist]
 	    figure = {'data': data,
 		      'layout': go.Layout(
-		          template='plotly_dark',
+		          template='plotly_white',
 		          autosize=True,
 		          xaxis={'range': [df_sub.index.min(), df_sub.index.max()]},
 		      )}
 	    
 	    return figure
     
-	app.run_server(debug=True)
+	app.run_server(debug=False)
