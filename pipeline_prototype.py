@@ -11,6 +11,7 @@ from sentiment_analysis.word2vec_sentiment import *
 import sentiment_analysis.sentimentDictionary as sd
 #from sentiment_analysis.fuctionality_sentiment_analysis import analyse_sentiment, listSearchTerm
 from sentiment_analysis.bert import GSBertPolarityModel
+from visualization.dash_plot import dash_plot
 import article_selection.article_selection as article_selection
 import json
 import csv
@@ -272,3 +273,9 @@ if __name__ == "__main__":
                 search_words,
                 methods=methods
             )
+	# ==================
+    # Plotting
+    # ==================
+    if config.getboolean("Plotting", "sentiment_plot"):
+        input_file = config.get("Plotting", "input_file") 
+        dash_plot(input_file)
