@@ -26,7 +26,8 @@ class GSBertPolarityModel:
 
     def __init__(self, model_name: str = "oliverguhr/german-sentiment-bert"):
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        # Always use original tokenizer
+        self.tokenizer = AutoTokenizer.from_pretrained("oliverguhr/german-sentiment-bert")
 
         self.clean_chars = re.compile(r'[^A-Za-züöäÖÜÄß ]', re.MULTILINE)
         self.clean_http_urls = re.compile(r'https*\S+', re.MULTILINE)
