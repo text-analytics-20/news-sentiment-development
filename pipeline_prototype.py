@@ -251,31 +251,32 @@ if __name__ == "__main__":
         calulate_sentiment(input_file, output_file,
                            search_words, methods=methods)
 
-        # =============================
-        # Sentiment analysis evaluation
-        # =============================
-        if config.getboolean("Analysis", "run_senti_eval"):
-            senti_eval_input = config.get("Analysis", "senti_eval_input")
-            search_words = config.get("Analysis", "search_words").lower().split(",")
-            senti_eval_output = config.get("Analysis", "senti_eval_output")
-            methods = config.get('Analysis', 'senti_methods').lower().split(", ")
+    # =============================
+    # Sentiment analysis evaluation
+    # =============================
+    if config.getboolean("Analysis", "run_senti_eval"):
+        senti_eval_input = config.get("Analysis", "senti_eval_input")
+        search_words = config.get("Analysis", "search_words").lower().split(",")
+        senti_eval_output = config.get("Analysis", "senti_eval_output")
+        methods = config.get('Analysis', 'senti_methods').lower().split(", ")
 
-            # Perform quantitative evaluation of sentiment analysis approaches
-            # using one or multiple of the following methods:
-            #   1. Sentiment-Dictionary (sentiws)
-            #   2. Neuronal-Network based Bert model
-            #      trained for gerneral sentiment analysis
-            #   3. Same Bert model with additional training
-            #      using labeled parts of news-articles about refugees
-            eval_sentiment(
-                senti_eval_input,
-                senti_eval_output,
-                search_words,
-                methods=methods
-            )
-	# ==================
+        # Perform quantitative evaluation of sentiment analysis approaches
+        # using one or multiple of the following methods:
+        #   1. Sentiment-Dictionary (sentiws)
+        #   2. Neuronal-Network based Bert model
+        #      trained for gerneral sentiment analysis
+        #   3. Same Bert model with additional training
+        #      using labeled parts of news-articles about refugees
+        eval_sentiment(
+            senti_eval_input,
+            senti_eval_output,
+            search_words,
+            methods=methods
+        )
+
+    # ==================
     # Plotting
     # ==================
     if config.getboolean("Plotting", "sentiment_plot"):
-        input_file = config.get("Plotting", "input_file") 
+        input_file = config.get("Plotting", "input_file")
         dash_plot(input_file)
