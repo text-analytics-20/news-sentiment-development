@@ -3,8 +3,10 @@ from spacy_sentiws import spaCySentiWS
 from sentiment_analysis.negation_handling import *
 
 # class that ranks sentiment based on a dicitionary apporach
-# based on sentiws by the leibzig university
+# based on sentiws by the leipzig university
+#   see: https://wortschatz.uni-leipzig.de/en/download
 # implemented using a Singelton pattern
+
 
 class SentimentDictionary():
     __instance = None
@@ -47,7 +49,7 @@ class SentimentDictionary():
         # This can be disabled for faster runtime or less memory usage
         self.saveSentencesWithSentiment = Boolean
 
-    # main function 
+    # main function
     # takes the text and a list of search Terms
     def predict_sentiment(self, text: str, searchTermList: list) -> float:
         
@@ -59,7 +61,7 @@ class SentimentDictionary():
         doc = self.nlp(text)
 
         # the counter is used for normalization 
-        counter = 1
+        counter = 0
 
         # iterate through all sentences in the document
         for sentence in doc.sents:
@@ -86,7 +88,9 @@ class SentimentDictionary():
                     # save the sentences with sentiment 
                     self.count_this(self.sentencesWithSentiment, sentenceText, sentimentSentence)
                 self.sentimentText += sentimentSentence
-        return self.sentimentText/counter
+        if counter>0:
+            self.sentimentText /= counter 
+        return self.sentimentText
 
     def count_this(self, dictionary: dict, key: str, value: float = 1.0):
         # adds the given value or 1 to the key in the provided dictionary
@@ -106,6 +110,12 @@ def analyse_sentiment(text: str, listSearchTerms: list) -> float:
 
 
 if __name__ == "__main__":
-    texts = ["Flüchtlinge nehmen uns die Arbeitsplätze weg.", "Wir müssen uns gemeinsam anstregenen Flüchtlinge gut zu intigrieren.", "Wir schaffen das!", "Flüchtlinge sind scheiße!", "Flüchtlinge sind nicht scheiße!"]
+    
+    texts = ["Flüchtlinge nehmen uns die Arbeitsplätze weg.",
+             "Wir müssen uns gemeinsam anstregenen Flüchtlinge gut zu intigrieren.",
+             "Wir schaffen das!", 
+             "Flüchtlinge sind scheiße!", 
+             "Flüchtlinge sind nicht scheiße!"]
+
     for t in texts:
         print(t, analyse_sentiment(t, ["flüchtlinge"]))
