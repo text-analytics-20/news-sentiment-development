@@ -1,6 +1,7 @@
 import unittest
 import sentiment_analysis.sentiment_dictionary as sd
 import article_selection.article_selection as arts
+import sentiment_analysis.bert as bert
 import os
 
 class TestSentimentDictionary(unittest.TestCase):
@@ -12,7 +13,14 @@ class TestSentimentDictionary(unittest.TestCase):
         self.assertRaises(TypeError, sd.analyse_sentiment,[text], ["c"])
         self.assertRaises(TypeError, sd.analyse_sentiment,True, ["c"])
 
-class TestArticleSelection(unittest.TestCase):
+    def test_running(self):
+        sd.test()
+
+
+class TestSentimentBert(unittest.TestCase):
+    def test_running(self):
+        bert.test()
+
 
 class TestArticleSelection(unittest.TestCase):
     def test_wrong_input_is_topic_relevant(self):
@@ -20,10 +28,7 @@ class TestArticleSelection(unittest.TestCase):
         self.assertRaises(TypeError,arts.is_topic_relevant,"test")
         self.assertRaises(TypeError,arts.is_topic_relevant,3)
         self.assertRaises(TypeError,arts.is_topic_relevant,False)
-
-        # dictionary does not contain the keys title text
-        
-        
+   
         valid_article = {'date':'01.01.2020','title':"title",'text':"texttext", 'url':"http//a.de"}
 
         # second type is not a list of strings

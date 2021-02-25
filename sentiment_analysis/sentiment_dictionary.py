@@ -107,9 +107,10 @@ def test():
     texts = ["Flüchtlinge nehmen uns die Arbeitsplätze weg.",
              "Wir müssen uns gemeinsam anstregenen Flüchtlinge gut zu intigrieren.",
              "Wir schaffen das!", 
-             "Flüchtlinge sind scheiße!", 
-             "Flüchtlinge sind nicht scheiße!"]
+             "Flüchtlinge sind schlecht!", 
+             "Flüchtlinge sind nicht schlecht!"]
 
+    print("\n Sentiment analysis using sentiws:")
     for t in texts:
         print(t, analyse_sentiment(t, ["flüchtlinge"]))
 

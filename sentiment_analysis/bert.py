@@ -85,8 +85,12 @@ class GSBertPolarityModel:
 def test():
     model = GSBertPolarityModel()
     s = model.predict_sentiment_batch(['Du hirnloser Vollidiot!', 'Ich mag dich sehr.'])
+    print("\nSentiment analysis using bert:")
+    print("'Du hirnloser Vollidiot!'", "'Ich mag dich sehr.'")
     print(s)
     p = model.analyse_sentiment('Dieser Satz ist relativ neutral. Dieser hier auch.')
+    print("For a more neutral sentence:")
+    print("'Dieser Satz ist relativ neutral. Dieser hier auch.'")
     print(p)
 
 
