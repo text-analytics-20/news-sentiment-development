@@ -4,7 +4,6 @@ SentimentModel class based on https://huggingface.co/oliverguhr/german-sentiment
     (C) 2020 Oliver Guhr (MIT License)"""
 
 import re
-
 from typing import List
 
 import torch
@@ -12,9 +11,7 @@ import torch.nn.functional as F
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
-
 # 0: pos, 1: neg, 2: neutral
-
 
 
 class GSBertPolarityModel:
@@ -33,19 +30,19 @@ class GSBertPolarityModel:
         self.clean_http_urls = re.compile(r'https*\S+', re.MULTILINE)
         self.clean_at_mentions = re.compile(r'@\S+', re.MULTILINE)
 
-    def replace_numbers(self,text: str) -> str:
-        return text.replace("0"," null").replace("1"," eins").replace("2"," zwei")\
-            .replace("3"," drei").replace("4"," vier").replace("5"," fünf") \
-            .replace("6"," sechs").replace("7"," sieben").replace("8"," acht") \
-            .replace("9"," neun")         
+    def replace_numbers(self, text: str) -> str:
+        return text.replace("0", " null").replace("1", " eins").replace("2", " zwei") \
+            .replace("3", " drei").replace("4", " vier").replace("5", " fünf") \
+            .replace("6", " sechs").replace("7", " sieben").replace("8", " acht") \
+            .replace("9", " neun")
 
-    def clean_text(self,text: str) -> str:    
-        text = text.replace("\n", " ")        
-        text = self.clean_http_urls.sub('',text)
-        text = self.clean_at_mentions.sub('',text)        
-        text = self.replace_numbers(text)                
-        text = self.clean_chars.sub('', text) # use only text chars                          
-        text = ' '.join(text.split()) # substitute multiple whitespace with single whitespace   
+    def clean_text(self, text: str) -> str:
+        text = text.replace("\n", " ")
+        text = self.clean_http_urls.sub('', text)
+        text = self.clean_at_mentions.sub('', text)
+        text = self.replace_numbers(text)
+        text = self.clean_chars.sub('', text)  # use only text chars
+        text = ' '.join(text.split())  # substitute multiple whitespace with single whitespace
         text = text.strip().lower()
         return text
 
@@ -76,7 +73,7 @@ class GSBertPolarityModel:
         with torch.no_grad():
             logits = self.model(input_ids)
             probs = F.softmax(logits[0], dim=1)
-        
+
         polarities = self.probs2polarities(probs)
         return polarities
 

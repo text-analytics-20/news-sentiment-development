@@ -16,7 +16,6 @@ nlp = spacy.load('de_core_news_sm')
 LABELING_PROMPT = ('\n == Please label sentiment (p = positive, n = negative, '
                    'h = hostile, enter: neutral): ')
 
-
 # Get search keywords from config.ini found in the same directory
 config_path = os.path.join(os.path.dirname(__file__), 'config.ini')
 config = configparser.ConfigParser()
@@ -91,7 +90,7 @@ def sentiment_annotation(texts: Sequence[str], output_path: str) -> None:
         print(f'\n\n{section}')
         sentiment = input(LABELING_PROMPT)
 
-        #check for valid input
+        # check for valid input
         while sentiment not in translation.keys():
             print(LABELING_PROMPT)
             print(f'\n\n{section}')

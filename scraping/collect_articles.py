@@ -29,13 +29,12 @@ URL and additional site-dependent metadata.
 import argparse
 import logging
 
-from scraping import read_sources, scrape_and_store_articles, change_log_file_path
+from scraping import change_log_file_path, read_sources, scrape_and_store_articles
 
 logger = logging.getLogger('scraping')
 
 
 def main():
-    
     parser = argparse.ArgumentParser(epilog=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
         'source_path',
@@ -83,6 +82,6 @@ def main():
         num_workers=num_workers
     )
 
+
 if __name__ == '__main__':
     main()
-

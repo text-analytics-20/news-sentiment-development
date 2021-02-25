@@ -5,14 +5,12 @@ import functools
 import json
 import logging
 import os
-
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Sequence
 
 import newspaper
 from tqdm import tqdm
-
 
 NP_DEFAULT_CONFIG = {
     'language': 'de',
@@ -40,6 +38,7 @@ def setup_logging(log_path: str = '/tmp/scraping.log') -> logging.Logger:
     logger.addHandler(f_handler)
     logger.propagate = False
     return logger
+
 
 # Instantiate module logger
 logger = setup_logging()

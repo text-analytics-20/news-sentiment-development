@@ -44,7 +44,6 @@ import traceback
 import newspaper
 from tqdm import tqdm
 
-
 parser = argparse.ArgumentParser(epilog=__doc__, formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('url', help='Base URL of a news website')
 parser.add_argument(
@@ -74,7 +73,6 @@ print(f'Found {len(site.articles)} articles on {url} ({site.brand})')
 if len(site.articles) == 0:
     raise RuntimeError(f'No articles found. Aborting...')
 
-
 scraped_articles = {}
 failed_urls = []
 empty_urls = []
@@ -97,7 +95,6 @@ if len(failed_urls) > 0:
     print('\n'.join(failed_urls))
 print(f'Successfully retrieved {len(scraped_articles)} articles.')
 
-
 if outpath is None:
     outpath = site.brand + '.json'
 
@@ -105,4 +102,3 @@ if outpath is None:
 print(f'Storing collection in {outpath}')
 with open(outpath, 'w') as f:
     json.dump(scraped_articles, f)
-
