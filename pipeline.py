@@ -1,8 +1,8 @@
 #!/usr/bin/env python3.8
 
 """
-Prototype for a pipeline. It is controlled by a config.ini file
-and calls the functions for preprocessing and analysis.
+Central project pipeline, controlled by a config.ini file.
+Calls functions for preprocessing and analysis.
 """
 
 import configparser
