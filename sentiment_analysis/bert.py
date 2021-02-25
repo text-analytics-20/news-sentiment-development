@@ -82,9 +82,13 @@ class GSBertPolarityModel:
         return polarity
 
 
-if __name__ == '__main__':
+def test():
     model = GSBertPolarityModel()
     s = model.predict_sentiment_batch(['Du hirnloser Vollidiot!', 'Ich mag dich sehr.'])
     print(s)
     p = model.analyse_sentiment('Dieser Satz ist relativ neutral. Dieser hier auch.')
     print(p)
+
+
+if __name__ == '__main__':
+    test()

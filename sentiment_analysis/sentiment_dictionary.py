@@ -103,7 +103,7 @@ def analyse_sentiment(text: str, search_terms: list) -> float:
     return sd.sentimentText
 
 
-if __name__ == "__main__":
+def test():
     texts = ["Flüchtlinge nehmen uns die Arbeitsplätze weg.",
              "Wir müssen uns gemeinsam anstregenen Flüchtlinge gut zu intigrieren.",
              "Wir schaffen das!", 
@@ -112,3 +112,6 @@ if __name__ == "__main__":
 
     for t in texts:
         print(t, analyse_sentiment(t, ["flüchtlinge"]))
+
+if __name__ == "__main__":
+    test()
