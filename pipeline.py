@@ -13,6 +13,7 @@ import article_selection.article_selection as article_selection
 from sentiment_analysis.inference import calulate_sentiment, eval_sentiment
 from sentiment_analysis.word2vec_sentiment import *
 from visualization.dash_plot import dash_plot
+from visualization.wordcloud import generate_word_clouds
 
 if __name__ == "__main__":
 
@@ -148,3 +149,15 @@ if __name__ == "__main__":
     if config.getboolean("Plotting", "sentiment_plot"):
         input_file = config.get("Plotting", "input_file")
         dash_plot(input_file)
+
+    # ==================
+    # WordClouds
+    # ==================
+    if config.getboolean("WordClouds", "wordcloud_plot"):
+		input_file = config.get("WordClouds", "input_file")
+		output_path = config.get("WordClouds", "output_path")
+		words = config.get("WordClouds", "words")
+		column_values = config.get("WordClouds", "column_values")
+		number_of_words_in_wordcloud = config.get("WordClouds", "number_of_words_in_wordcloud")
+        
+		generate_word_clouds(input_file, words, column_values, output_path, number_of_words_in_wordcloud)
