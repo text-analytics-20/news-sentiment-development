@@ -26,8 +26,13 @@ def word_cloud_from_json(word, column, json_df, output_path, number_of_words_in_
         print('Wordcloud for ' + word + ' for ' + str(column) + ' saved as ' + output_filename + '.')
 
 def generate_word_clouds(json_file, word_list, columns, output_path, number_of_words_in_wordcloud):
-# generate all word clouds for words in word_list and all years/publishers
-    json_df = pd.read_json(json_file) 
+    # generate all word clouds for words in word_list and all years/publishers
+    try:
+        json_df = pd.read_json(json_file)
+    except:
+        print("Error during generation of word cloud:")
+        print(f"     File {json_file} could not be read.")
+        return
     for word in word_list:
     	for column in columns:
             word_cloud_from_json(word, column, json_df, output_path, number_of_words_in_wordcloud)
