@@ -23,16 +23,20 @@ from sentiment_analysis.bert import GSBertPolarityModel
 from sentiment_analysis.word2vec_sentiment import *
 from visualization.dash_plot import dash_plot
 
-FTS_PATH = './data/finetuned-sentibert-checkpoint-225/'
 
-
-def calulate_sentiment(input_path: str, output_path: str, search_words: list, methods: Sequence[str]):
+def calulate_sentiment(
+        input_path: str,
+        output_path: str,
+        search_words: list,
+        methods: Sequence[str],
+        finetuned_sentibert_path: str
+):
     # Initialize BERT models
     generic_sentibert, finetuned_sentibert = None, None
     if 'generic_sentibert' in methods:
         generic_sentibert = GSBertPolarityModel("oliverguhr/german-sentiment-bert")
     if 'finetuned_sentibert' in methods:
-        finetuned_sentibert = GSBertPolarityModel(FTS_PATH)
+        finetuned_sentibert = GSBertPolarityModel(finetuned_sentibert_path)
 
     # get the data from the given file path 
     content = pd.read_json(input_path, orient="index")
@@ -99,9 +103,9 @@ def absolute_error(
         label_smoothing: float = 1.0
 ) -> float:
     target_polarity = {
-        0: 1.0 * label_smoothing,
-        1: -1.0 * label_smoothing,
-        2: 0.0
+        0: 1.0 * label_smoothing,  # positive
+        1: -1.0 * label_smoothing,  # negative
+        2: 0.0  # neutral
     }[target_label]
     abserr = abs(pred_polarity - target_polarity)
     return abserr
@@ -119,8 +123,9 @@ def categorical_error(pred_polarity: float, target_label: float) -> float:
 def eval_sentiment(
         senti_eval_input: str,
         senti_eval_output: str,
-        search_words: list,
-        methods: Sequence[str]
+        search_words: Sequence[str],
+        methods: Sequence[str],
+        finetuned_sentibert_path: str
 ):
     print(f'Evaluating sentiment analysis methods on {senti_eval_input}')
     # Initialize BERT models
@@ -128,7 +133,7 @@ def eval_sentiment(
     if 'generic_sentibert' in methods:
         generic_sentibert = GSBertPolarityModel("oliverguhr/german-sentiment-bert")
     if 'finetuned_sentibert' in methods:
-        finetuned_sentibert = GSBertPolarityModel(FTS_PATH)
+        finetuned_sentibert = GSBertPolarityModel(finetuned_sentibert_path)
 
     label_remap = {3: 1}  # Analogous to training setup: remap "hostile" to "negative"
     texts = []
@@ -288,6 +293,7 @@ if __name__ == "__main__":
         search_words = config.get("Analysis", "search_words").lower().split(",")
         output_file = config.get("Analysis", "output_senti")
         methods = config.get('Analysis', 'senti_methods').lower().split(", ")
+        finetuned_sentibert_path = config.get('Analysis', 'finetuned_sentibert_path')
 
         # calculate the article sentiment
         # using one or multiple of the following methods:
@@ -296,8 +302,13 @@ if __name__ == "__main__":
         #      trained for gerneral sentiment analysis
         #   3. Same Bert model with additional training
         #      using labeled parts of news-articles about refugees
-        calulate_sentiment(input_file, output_file,
-                           search_words, methods=methods)
+        calulate_sentiment(
+            input_file,
+            output_file,
+            search_words,
+            methods=methods,
+            finetuned_sentibert_path=finetuned_sentibert_path
+        )
 
     # =============================
     # Sentiment analysis evaluation
@@ -307,6 +318,7 @@ if __name__ == "__main__":
         search_words = config.get("Analysis", "search_words").lower().split(",")
         senti_eval_output = config.get("Analysis", "senti_eval_output")
         methods = config.get('Analysis', 'senti_methods').lower().split(", ")
+        finetuned_sentibert_path = config.get('Analysis', 'finetuned_sentibert_path')
 
         # Perform quantitative evaluation of sentiment analysis approaches
         # using one or multiple of the following methods:
@@ -319,7 +331,8 @@ if __name__ == "__main__":
             senti_eval_input,
             senti_eval_output,
             search_words,
-            methods=methods
+            methods=methods,
+            finetuned_sentibert_path=finetuned_sentibert_path
         )
 
     # ==================
