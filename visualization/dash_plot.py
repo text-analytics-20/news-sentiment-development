@@ -32,7 +32,7 @@ def dash_plot(filepath):
 		html.Div(className='row',
 		         children=[
 		            html.Div(children=[
-		                         html.H2('Sentiment Development on the example of "Migration" '),
+		                         html.H2('News sentiment development on the example of "migration"'),
 		                         html.P('Pick one or more publishers and sentiment types from the dropdown below.'),
 		                         html.Div(
 		                             children=[

@@ -1,4 +1,4 @@
-# Sentiment development on the example of “Migration”
+# News sentiment development on the example of “Migration”
 
 Team members:
 
