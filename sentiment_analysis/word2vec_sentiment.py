@@ -119,6 +119,7 @@ def similarity_by_year(input_path :  str,output_path : str, search_words : list,
 
 def similarity_by_publisher(input_path: str,output_path: str, search_words: list, 
                             start_year=2007, end_year=2015, number_most_sim=10):
+   
     content = pd.read_json(input_path, orient="index")
     content = content[["date","text","url"]]
     most_sim = {}
@@ -127,7 +128,7 @@ def similarity_by_publisher(input_path: str,output_path: str, search_words: list
         try:
             publisher = row["url"].split("//")[1].split("/")[0].split(".")[1]
         except KeyError:
-            print("ERROR")
+            print("KeyError no url")
             print(row)
             continue
         if publisher in list_publishers:
@@ -141,13 +142,14 @@ def similarity_by_publisher(input_path: str,output_path: str, search_words: list
                 sw.clean_and_train()
                 most_sim[publisher]={ key : sw.get_most_similar(key ,number_most_sim) for key in search_words}     
             except RuntimeError:
-                print("RuntimeError in training for publisher: {publisher}")
+                print(f"RuntimeError in training for publisher: {publisher}")
     with open(output_path+"_by_publisher.json","w") as f:
         json.dump(most_sim,f)
 
 def similarity_by_year_and_publisher(input_path : str, output_path : str,search_words : list,
                                      start_year=2007, end_year=2015, number_most_sim=10):
-    content=pd.read_json(input_path, orient="index")
+
+    content = pd.read_json(input_path, orient="index")
     content=content[["date","text","url"]]
     most_sim={}
     list_publishers = []
@@ -156,7 +158,7 @@ def similarity_by_year_and_publisher(input_path : str, output_path : str,search_
         try:
             publisher = row["url"].split("//")[1].split("/")[0].split(".")[1]
         except KeyError:
-            print("ERROR")
+            print("KeyError no url")
             print(row)
             continue
         if publisher not in list_publishers:
@@ -173,7 +175,7 @@ def similarity_by_year_and_publisher(input_path : str, output_path : str,search_
             sw.clean_and_train()
             most_sim[publisher][year]={ key : sw.get_most_similar(key ,number_most_sim) for key in search_words}
         except RuntimeError:
-            print("ERROR")
+            print(f"RuntimeError in training for publisher: {publisher} and year: {year}")
             continue
     with open(output_path+"_by_publisher_and_year.json","w") as f:
         json.dump(most_sim,f)

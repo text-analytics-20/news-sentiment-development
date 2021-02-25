@@ -30,7 +30,6 @@ if __name__ == "__main__":
     # Selection of relevant Articles
     # ==============================
     if config.getboolean("ArticleSelection", "run_article_selection"):
-
         # create input filepath for article selection from:
         # the path to the folders and the start and end year
         base_path = config.get("ArticleSelection", "input_path_base")
@@ -71,7 +70,7 @@ if __name__ == "__main__":
     # Word2Vec analysis
     # ===================
     if config.getboolean("Analysis", "run_w2v"):
-        print("Start word2vec analysis")
+        print("\nStart word2vec analysis")
         input_file = config.get("Analysis", "input_file")
         search_words = config.get("Analysis", "search_words_w2v").lower().split(",")
         base_output_path = config.get("Analysis", "output_base_w2v")
@@ -94,12 +93,13 @@ if __name__ == "__main__":
             similarity_by_year_and_publisher(input_file, base_output_path,
                                              search_words, start_year,
                                              end_year, number_most_sim)
+        print("\nEnd word2vec analysis\n")
 
     # ==================
     # Sentiment analysis
     # ==================
     if config.getboolean("Analysis", "run_senti"):
-        print("Start sentiment analysis")
+        print("\nStart sentiment analysis")
         input_file = config.get("Analysis", "input_file")
         search_words = config.get("Analysis", "search_words").lower().split(",")
         output_file = config.get("Analysis", "output_senti")
@@ -125,6 +125,7 @@ if __name__ == "__main__":
     # Sentiment analysis evaluation
     # =============================
     if config.getboolean("Analysis", "run_senti_eval"):
+        print("\nStart Evaluation")
         senti_eval_input = config.get("Analysis", "senti_eval_input")
         search_words = config.get("Analysis", "search_words").lower().split(",")
         senti_eval_output = config.get("Analysis", "senti_eval_output")
