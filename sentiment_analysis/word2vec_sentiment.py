@@ -83,16 +83,18 @@ class SentiW2v:
         except KeyError:
             print(f"The word {word} is not in the in vocabulary.")
 
-    def get_most_similar(self,word):
+    def get_most_similar(self,word, number):
         try:
-            return self.w2v_model.wv.most_similar(word)
+            return self.w2v_model.wv.most_similar(word, topn=number)
         except KeyError:
             print(f"The word {word} is not in the in vocabulary.")
 
 
-def similarity_by_year(input_path :  str,output_path : str, search_words : list, start_year=2007, end_year=2015):
+def similarity_by_year(input_path :  str,output_path : str, search_words : list,
+                       start_year=2007, end_year=2015, number_most_sim=10):
     # lemmatize the search words
-    search_doc = self.nlp(" ".join(search_words))
+    nlp = spacy.load("de")
+    search_doc = nlp(" ".join(search_words))
     search_words = [token.lemma_ for token in search_doc]
     
 
@@ -116,11 +118,12 @@ def similarity_by_year(input_path :  str,output_path : str, search_words : list,
         print(f"Time to reduce content {round((time() - t) / 60, 2)} mins")
         sw.set_text_from_pandas(sub_cont)
         sw.clean_and_train()
-        most_sim[year] = { key : sw.get_most_similar(key) for key in search_words}
+        most_sim[year] = { key : sw.get_most_similar(key ,number_most_sim) for key in search_words}
     with open(output_path+"_by_year.json","w") as f:
         json.dump(most_sim,f)
 
-def similarity_by_publisher(input_path: str,output_path: str, search_words: list, start_year=2007, end_year=2015):
+def similarity_by_publisher(input_path: str,output_path: str, search_words: list, 
+                            start_year=2007, end_year=2015, number_most_sim=10):
     content = pd.read_json(input_path, orient="index")
     content = content[["date","og","text","url"]]
     most_sim = {}
@@ -136,19 +139,19 @@ def similarity_by_publisher(input_path: str,output_path: str, search_words: list
             continue
         else:
             list_publishers.append(publisher)
-            most_sim[publisher]=[]
             sw=SentiW2v()
             sub_cont=content[content["url"].str.contains(publisher)]
             sw.set_text_from_pandas(sub_cont)
             try:
                 sw.clean_and_train()
-                most_sim[publisher].append({ key : sw.get_most_similar(key) for key in search_words})            
+                most_sim[publisher]={ key : sw.get_most_similar(key ,number_most_sim) for key in search_words}     
             except RuntimeError:
-                print("ERROR")
+                print("RuntimeError in training for publisher: {publisher}")
     with open(output_path+"_by_publisher.json","w") as f:
         json.dump(most_sim,f)
 
-def similarity_by_year_and_publisher(input_path : str, output_path : str,search_words : list, start_year=2007, end_year=2015):
+def similarity_by_year_and_publisher(input_path : str, output_path : str,search_words : list,
+                                     start_year=2007, end_year=2015, number_most_sim=10):
     content=pd.read_json(input_path, orient="index")
     content=content[["date","og","text","url"]]
     most_sim={}
@@ -173,7 +176,7 @@ def similarity_by_year_and_publisher(input_path : str, output_path : str,search_
         sw.set_text_from_pandas(sub_cont)
         try:
             sw.clean_and_train()
-            most_sim[publisher][year]={ key : sw.get_most_similar(key) for key in search_words}
+            most_sim[publisher][year]={ key : sw.get_most_similar(key ,number_most_sim) for key in search_words}
         except RuntimeError:
             print("ERROR")
             continue

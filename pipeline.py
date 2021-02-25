@@ -76,22 +76,23 @@ if __name__ == "__main__":
         base_output_path = config.get("Analysis", "output_base_w2v")
         start_year = config.getint("Analysis", "start_year")
         end_year = config.getint("Analysis", "end_year")
+        number_most_sim = config.getint("Analysis", "number_most_sim")
 
         # all articles of the same year are one dataset
         if config.getboolean("Analysis", "run_by_year"):
             similarity_by_year(input_file, base_output_path, search_words,
-                               start_year, end_year)
+                               start_year, end_year, number_most_sim)
 
         # all articles of the same publisher are one dataset
         if config.getboolean("Analysis", "run_by_publisher"):
             similarity_by_publisher(input_file, base_output_path, search_words,
-                                    start_year, end_year)
+                                    start_year, end_year, number_most_sim)
 
         # all articles of the same publisher during the same year are one dataset
         if config.getboolean("Analysis", "run_by_publisher_by_year"):
             similarity_by_year_and_publisher(input_file, base_output_path,
                                              search_words, start_year,
-                                             end_year)
+                                             end_year, number_most_sim)
 
     # ==================
     # Sentiment analysis
