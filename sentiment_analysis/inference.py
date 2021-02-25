@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from sentiment_analysis import sentimentDictionary as sd
+from sentiment_analysis import sentiment_dictionary as sd
 from sentiment_analysis.bert import GSBertPolarityModel
 
 

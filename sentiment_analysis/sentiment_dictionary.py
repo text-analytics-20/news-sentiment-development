@@ -2,10 +2,10 @@ import spacy
 from spacy_sentiws import spaCySentiWS
 from sentiment_analysis.negation_handling import *
 
-# class that ranks sentiment based on a dicitionary apporach
+# class that ranks sentiment based on a dictionary approach
 # based on sentiws by the leipzig university
 #   see: https://wortschatz.uni-leipzig.de/en/download
-# implemented using a Singelton pattern
+# implemented using a singleton pattern
 
 
 class SentimentDictionary():
@@ -35,25 +35,14 @@ class SentimentDictionary():
     sentimentText = 0.0
     sentencesWithSentiment = {}
     compound = {}
-    sentimentTextIsAdditiv = False
+    sentimentTextIsAdditive = False
     saveSentencesWithSentiment = False
-
-    def setSentimentTextAddititv(self, Boolean):
-        # additiv sentiment can be enabled
-        # if the text is to long to be read at once
-        # or text is given piece by piece
-        self.sentimentTextIsAdditiv = Boolean
-    
-    def saveSenteneces(self, Boolean):
-        # per default sentences with sentiment are saved to check for double usage
-        # This can be disabled for faster runtime or less memory usage
-        self.saveSentencesWithSentiment = Boolean
 
     # main function
     # takes the text and a list of search Terms
     def predict_sentiment(self, text: str, searchTermList: list) -> float:
        
-        if not self.sentimentTextIsAdditiv:
+        if not self.sentimentTextIsAdditive:
             # new sentiment is calculated for every function call
             self.sentimentText = 0.0
 

@@ -1,5 +1,5 @@
 import unittest
-import sentiment_analysis.sentimentDictionary as sd
+import sentiment_analysis.sentiment_dictionary as sd
 import article_selection.article_selection as arts
 
 class TestSentimentDictionary(unittest.TestCase):

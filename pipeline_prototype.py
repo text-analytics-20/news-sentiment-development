@@ -10,7 +10,6 @@ import glob
 import sys
 
 import article_selection.article_selection as article_selection
-# from sentiment_analysis.fuctionality_sentiment_analysis import analyse_sentiment, listSearchTerm
 from sentiment_analysis.inference import calulate_sentiment, eval_sentiment
 from sentiment_analysis.word2vec_sentiment import *
 from visualization.dash_plot import dash_plot
