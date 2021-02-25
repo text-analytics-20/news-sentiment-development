@@ -71,6 +71,7 @@ if __name__ == "__main__":
     # Word2Vec analysis
     # ===================
     if config.getboolean("Analysis", "run_w2v"):
+        print("Start word2vec analysis")
         input_file = config.get("Analysis", "input_file")
         search_words = config.get("Analysis", "search_words_w2v").lower().split(",")
         base_output_path = config.get("Analysis", "output_base_w2v")
@@ -98,6 +99,7 @@ if __name__ == "__main__":
     # Sentiment analysis
     # ==================
     if config.getboolean("Analysis", "run_senti"):
+        print("Start sentiment analysis")
         input_file = config.get("Analysis", "input_file")
         search_words = config.get("Analysis", "search_words").lower().split(",")
         output_file = config.get("Analysis", "output_senti")

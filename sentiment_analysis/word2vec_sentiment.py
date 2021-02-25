@@ -39,12 +39,10 @@ class SentiW2v:
 
     def set_text_from_file(self,path):
         df = pd.read_json(path, orient='index')        
-        # self.df = self.df[["date","og","text"]]
         self.text=df["text"]
 
-    def set_text_from_pandas(self, data):#
+    def set_text_from_pandas(self, data):
         df = data
-        # self.df = df[["date","og","text"]]
         self.text=df["text"]
 
     def clean_and_train(self):
@@ -101,11 +99,8 @@ def similarity_by_year(input_path :  str,output_path : str, search_words : list,
     try:
         content = pd.read_json(input_path, orient="index", precise_float=True) # , numpy=True)
     except ValueError:
-        print("oh shit ValueError")
         return
-        # with open(input_path, "r") as f:
-        #     cont = json.load(f)
-
+        
     content = content[["date","text","url"]]
     most_sim = {}
 
@@ -118,14 +113,14 @@ def similarity_by_year(input_path :  str,output_path : str, search_words : list,
         print(f"Time to reduce content {round((time() - t) / 60, 2)} mins")
         sw.set_text_from_pandas(sub_cont)
         sw.clean_and_train()
-        most_sim[year] = { key : sw.get_most_similar(key ,number_most_sim) for key in search_words}
+        most_sim[str(year)] = { key : sw.get_most_similar(key ,number_most_sim) for key in search_words}
     with open(output_path+"_by_year.json","w") as f:
         json.dump(most_sim,f)
 
 def similarity_by_publisher(input_path: str,output_path: str, search_words: list, 
                             start_year=2007, end_year=2015, number_most_sim=10):
     content = pd.read_json(input_path, orient="index")
-    content = content[["date","og","text","url"]]
+    content = content[["date","text","url"]]
     most_sim = {}
     list_publishers = []
     for i , row in content.iterrows():
@@ -153,7 +148,7 @@ def similarity_by_publisher(input_path: str,output_path: str, search_words: list
 def similarity_by_year_and_publisher(input_path : str, output_path : str,search_words : list,
                                      start_year=2007, end_year=2015, number_most_sim=10):
     content=pd.read_json(input_path, orient="index")
-    content=content[["date","og","text","url"]]
+    content=content[["date","text","url"]]
     most_sim={}
     list_publishers = []
     for i , row in content.iterrows():
