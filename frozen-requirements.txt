@@ -78,9 +78,9 @@ thinc==7.4.5
 tinysegmenter==0.3
 tldextract==3.1.0
 tokenizers==0.10.1
-torch==1.7.1+cpu
-torchaudio==0.7.2
-torchvision==0.8.2+cpu
+torch==1.7.1 -f https://download.pytorch.org/whl/torch_stable.html
+torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
+torchvision==0.8.2 -f https://download.pytorch.org/whl/torch_stable.html
 tqdm==4.57.0
 traitlets==5.0.5
 transformers==4.3.2
