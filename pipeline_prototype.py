@@ -12,6 +12,8 @@ import sys
 import traceback
 from typing import Sequence
 
+import numpy as np
+import pandas as pd
 from tqdm import tqdm
 
 import article_selection.article_selection as article_selection
@@ -91,6 +93,29 @@ def calulate_sentiment(input_path: str, output_path: str, search_words: list, me
         json.dump(data, f, default=str, ensure_ascii=False)
 
 
+def absolute_error(
+        pred_polarity: float,
+        target_label: float,
+        label_smoothing: float = 1.0
+) -> float:
+    target_polarity = {
+        0: 1.0 * label_smoothing,
+        1: -1.0 * label_smoothing,
+        2: 0.0
+    }[target_label]
+    abserr = abs(pred_polarity - target_polarity)
+    return abserr
+
+
+def categorical_error(pred_polarity: float, target_label: float) -> float:
+    if target_label == 0:  # positive
+        return pred_polarity < + (1 / 3)
+    if target_label == 1:  # negative
+        return pred_polarity > - (1 / 3)
+    if target_label == 2:  # neutral
+        return abs(pred_polarity) < (1 / 3)
+
+
 def eval_sentiment(
         senti_eval_input: str,
         senti_eval_output: str,
@@ -122,33 +147,59 @@ def eval_sentiment(
             labels.append(label)
 
     # create dictionary with output data
-    results = {}
+    full_results = {}
+    aggregated_results = {}
 
-    for text, label in tqdm(zip(texts, labels), total=len(texts), dynamic_ncols=True):
+    # Values lower than 1 make conversion from categorical labels to polarities more smooth
+    label_smoothing = 1.0
 
-        # TODO: Calculate metrics, store in results dict, print them.
-        #       Currently this code does nothing.
+    for method in methods:
+        full_results[method] = {'categorical_errors': [], 'absolute_errors': []}
+        aggregated_results[method] = {}
 
-        # 1. use the sentiment dictionary "sentiws"
-        if 'sentiws' in methods:
-            sentiment_sentiws = sd.analyse_sentiment(text, search_words)
-            if sentiment_sentiws == '':
-                sentiment_sentiws = float('nan')
-            else:
-                sentiment_sentiws = float(sentiment_sentiws)
+        # Calculate metrics on each entry in the validation dataset
+        for text, target_label in tqdm(
+                zip(texts, labels),
+                total=len(texts),
+                dynamic_ncols=True,
+                desc=method
+        ):
 
-        # 2. use the generic bert model
-        if 'generic_sentibert' in methods:
-            sentiment_generic_sentibert = generic_sentibert.analyse_sentiment(text)
+            if method == 'sentiws':
+                pred_polarity = sd.analyse_sentiment(text, search_words)
+                if pred_polarity == '':
+                    pred_polarity = 0.0  # 'nan'
+                pred_polarity = float(pred_polarity)
+            elif method == 'generic_sentibert':
+                pred_polarity = generic_sentibert.analyse_sentiment(text)
+            elif method == 'finetuned_sentibert':
+                pred_polarity = finetuned_sentibert.analyse_sentiment(text)
 
-        # 3. use the self trained bert model
-        if 'finetuned_sentibert' in methods:
-            sentiment_finetuned_sentibert = finetuned_sentibert.analyse_sentiment(text)
+            # Calculate error metrics: absolute error (using polarities)
+            abserr = absolute_error(
+                pred_polarity,
+                target_label,
+                label_smoothing=label_smoothing
+            )
+            full_results[method]['absolute_errors'].append(abserr)
+
+            # Alternative error metric: categorical error
+            # (bool that indicates if prediction is within the expected interval)
+            caterr = categorical_error(pred_polarity, target_label)
+            full_results[method]['categorical_errors'].append(caterr)
+
+        # Aggregate metrics
+        for metric_name in ['absolute_errors', 'categorical_errors']:
+            aggregated_results[method][f'mean_{metric_name[:-1]}'] = np.mean(full_results[method][metric_name])
+            aggregated_results[method][f'std_{metric_name[:-1]}'] = np.std(full_results[method][metric_name])
+
+    agr_pd = pd.DataFrame.from_dict(aggregated_results)
+    print(f'Aggregated results:\n{agr_pd}\n')
 
     # write data to file
     with open(senti_eval_output, "w", encoding='utf-8') as f:
         print(f"Write data to {senti_eval_output}")
-        json.dump(results, f, default=str, ensure_ascii=False)
+        json.dump(aggregated_results, f, default=str, ensure_ascii=False)
 
 
 if __name__ == "__main__":
