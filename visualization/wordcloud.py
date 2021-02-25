@@ -35,4 +35,7 @@ def generate_word_clouds(json_file, word_list, columns, output_path, number_of_w
         return
     for word in word_list:
     	for column in columns:
-            word_cloud_from_json(word, column, json_df, output_path, number_of_words_in_wordcloud)
+            if column.isdigit():
+                word_cloud_from_json(word, int(column), json_df, output_path, number_of_words_in_wordcloud)
+            else:
+                word_cloud_from_json(word, column, json_df, output_path, number_of_words_in_wordcloud)

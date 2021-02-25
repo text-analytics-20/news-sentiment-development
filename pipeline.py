@@ -159,6 +159,6 @@ if __name__ == "__main__":
         output_path = config.get("WordClouds", "output_path")
         words = config.get("WordClouds", "words").lower().split(", ")
         column_values = config.get("WordClouds", "column_values").lower().split(", ")
-        number_of_words_in_wordcloud = config.get("WordClouds", "number_of_words_in_wordcloud")
+        number_of_words_in_wordcloud = config.getint("WordClouds", "number_of_words_in_wordcloud")
 
         generate_word_clouds(input_file, words, column_values, output_path, number_of_words_in_wordcloud)
