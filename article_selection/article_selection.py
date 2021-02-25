@@ -8,6 +8,7 @@ running scraping/scrape.py) by relevant search keywords.
 import json
 import os
 import random
+import traceback
 from tqdm import tqdm
 
 
@@ -18,21 +19,19 @@ def is_topic_relevant(article, keywords: list = ['migra', 'flücht', 'asyl']):
     if not keywords or not isinstance(keywords, list) or not all(isinstance(kw,str) for kw in keywords) :
         raise TypeError("keywords must be non empty list of strings")
     
+    if not all(key in article for key in ['date','title','text', 'url']): 
+        # check if article contains all keys needed for further analysis
+        return False
+
     try:
         search_corpus = article['news_keywords'].lower() # not every article has the attribute news_keywords
     except KeyError:
-        try:
-            search_corpus = article['title'].lower() + article['text'].lower() # article['description'] could be considered as well if attribute available
-        except KeyError:
-            # File has different structur than the used article files 
-            return False
+        search_corpus = article['title'].lower() + article['text'].lower()
     except AttributeError:
         print(f"ERROR: News Keywords are {article['news_keywords']}")
         return False
-    try: 
-        article['date']
-    except KeyError:
-        return False
+
+
     # returns True if keyword is found and false otherwise
     if any(keyword in search_corpus for keyword in keywords):
         return True 
@@ -67,7 +66,10 @@ def write_relevant_content_to_file(file_list, relevant_articles_base, search_key
                 if(is_topic_relevant(content)):
                     new_cont[json_file] = content
         except FileNotFoundError:
-            pass
+            print(f"Warning: File {json_file} can not be opend.")
+        except TypeError:
+            traceback.print_exc()
+        
     
     print(f"Total number of relavant articles: {len(new_cont)}")
     if annotation:
