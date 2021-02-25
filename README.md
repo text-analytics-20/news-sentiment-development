@@ -25,25 +25,24 @@ Analyzing the sentiment development of news articles with the topic "migration" 
 
 # Set-Up Instructions:
                
-Set up requirements: Linux, Python 3.8
-- Clone this repository
-- Create a new virtual environment and activate it:
-```
-virtualenv env
-source env/bin/activate
-```
-Install the dependencies from the frozen-requirements.txt and then
-install the german language-package for spacy:
+### Set up requirements: Linux, Python 3.8
 
-```
-pip install -r frozen-requirements.txt
-python -m spacy download de
-```
+1. Clone this repository
 
-
+2. Create a new virtual environment and activate it:
+   ```
+    virtualenv env
+    source env/bin/activate
+    ```
+3. Install the dependencies from the frozen-requirements.txt and then install the german language-package for spacy:
+    ```
+    pip install -r frozen-requirements.txt
+    python -m spacy download de
+    ```
 
 # Instructions to run the code
-## get the data
+
+## Get the data
 Either ask us for the scraped articles or run `scraping/collect_articles.py` with the following arguments: 
 1. source_path 
 2. output_path
@@ -61,7 +60,6 @@ pipeline.py config.ini
 ### We can provide already generated data on request to not violate copyrights.
 
 Team members:
-
 - Simon Lüdke (simon.luedke at gmx.de)
 - Josephine Grau (josephine.grau at web.de)
 - Martin Drawitsch (martin.drawitsch at gmail.com)
