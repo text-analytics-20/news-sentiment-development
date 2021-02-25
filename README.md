@@ -45,10 +45,10 @@ python -m spacy download de
 # Instructions to run the code
 ## get the data
 Either ask us for the scraped articles or run `scraping/collect_articles.py` with the following arguments: 
-source_path 
-output_path
-log_path
-num_workers
+1. source_path 
+2. output_path
+3. log_path
+4. num_workers
 
 ## Run the pipeline
 The pipeline is controlled by the *config.ini* file. 
@@ -58,4 +58,11 @@ Then run
 pipeline.py config.ini
 ```
 
-We can provide already generated data on request to not violate copyrights.
+### We can provide already generated data on request to not violate copyrights.
+
+Team members:
+
+- Simon Lüdke (simon.luedke at gmx.de)
+- Josephine Grau (josephine.grau at web.de)
+- Martin Drawitsch (martin.drawitsch at gmail.com)
+
