@@ -89,6 +89,10 @@ def absolute_error(
         target_label: float,
         label_smoothing: float = 1.0
 ) -> float:
+    """Absolute error of a sentiment polarity prediction.
+    The target label is converted to a polarity and compared with the predicted
+    polarity.
+    """
     target_polarity = {
         0: 1.0 * label_smoothing,  # positive
         1: -1.0 * label_smoothing,  # negative
@@ -99,12 +103,20 @@ def absolute_error(
 
 
 def categorical_error(pred_polarity: float, target_label: float) -> float:
+    """Categorical error of a sentiment label prediction.
+    Converts the predicted polarity into a discrete label and compares it
+    with a discrete target label.
+    Output is 0 if the predicted label matches the target label, else it is 1.
+    """
     if target_label == 0:  # positive
+        # ==> Count as error if prediction not within positive interval [(1/3), 1]
         return pred_polarity < + (1 / 3)
     if target_label == 1:  # negative
+        # ==> Count as error if prediction not within negative interval [-1, -(1/3)]
         return pred_polarity > - (1 / 3)
     if target_label == 2:  # neutral
-        return abs(pred_polarity) < (1 / 3)
+        # ==> Count as error if prediction not within neutral interval [-(1/3), (1/3)]
+        return abs(pred_polarity) >= (1 / 3)
 
 
 def eval_sentiment(
