@@ -10,12 +10,12 @@ Analyzing the sentiment development of news articles with the topic "migration" 
     - **`bert.py`**: Evaluation of sentiment by the BERT model
     - **`sentiment_dictionary.py`**: Evaluation of sentiment through the SentiWS dictionary
     - **`negation_handling.py`**: Improvement of the dictionary approach by handling the negation of words
-    - **`word2vec_sentiment.py `**: Word2Vec Model to get synonyms of search words for qualitative analysis
+    - **`word2vec_sentiment.py`**: Word2Vec Model to get synonyms of search words for qualitative analysis
     - **`inference.py`**: functions for applying and evaluating sentiment analysis methods on large batches of data
 
 - **`training`**: Training code to fine-tune the BERT Model
 - **`visualization`**:
-    - **`dash_plot.py `**: Dash application to show sentiment timelines
+    - **`dash_plot.py`**: Dash application to show sentiment timelines
     - **`wordcloud.py`**: Generates word clouds of results from word2vec model
 
 ### Other components
@@ -42,15 +42,13 @@ Analyzing the sentiment development of news articles with the topic "migration" 
 
 # Instructions to run the code
 
-## Get the data
-Either ask us for the scraped articles or run `scraping/collect_articles.py` with the following arguments: 
-1. source_path 
-2. output_path
-3. log_path
-4. num_workers
+## Obtain the news article data dataset
+Either ask us for the scraped articles or use `scraping/collect_articles.py` to build the dataset yourself (can take a few days).
+For detailed instructions, refer to the docstring of [collect_articles.py])https://github.com/text-analytics-20/news-sentiment-development/blob/main/scraping/collect_articles.py).
+The expected article source files (*-sources.txt files) can be obtained from https://wortschatz.uni-leipzig.de/en/download/german). They are located inside of the .zip files listed there.
 
 ## Run the pipeline
-The pipeline is controlled by the *config.ini* file. 
+The pipeline is controlled by the `config.ini` file. 
 Configure it as you wish.
 Then run 
 ```
