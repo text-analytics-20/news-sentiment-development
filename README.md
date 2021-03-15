@@ -45,7 +45,7 @@ This project was done in the course of the [Text Analytics lecture](https://dbs.
 
 ### Obtain the news article data dataset
 Either ask us for the scraped articles or use `scraping/collect_articles.py` to build the dataset yourself (can take a few days).
-For detailed instructions, refer to the docstring of [collect_articles.py])https://github.com/text-analytics-20/news-sentiment-development/blob/main/scraping/collect_articles.py).
+For detailed instructions, refer to the docstring of [collect_articles.py](https://github.com/text-analytics-20/news-sentiment-development/blob/main/scraping/collect_articles.py).
 
 The expected article source files (*-sources.txt files) can be obtained from https://wortschatz.uni-leipzig.de/en/download/German). They are located inside of the .tar.gz files listed there. For this project we used the following archives:
 
