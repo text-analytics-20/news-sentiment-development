@@ -73,7 +73,7 @@ pipeline.py config.ini
 ## Note on data availability
 We cannot upload our article data publicly due to copyright reasons.
 If you are interested in our dataset version and/or in the intermediate results, please email us so we can help you.
-Our finetuned BERT model
+Our finetuned BERT model can be found at https://huggingface.co/mdraw/german-news-sentiment-bert
 
 
 ## Team members
